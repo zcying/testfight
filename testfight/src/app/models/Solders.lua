@@ -8,8 +8,9 @@ Solders.SOLDERS_TYPE_INFANTRY=3
 
 local SolderBase=import(".SolderBase")
 local SolderHorse=import(".SolderHorse")
-function Solders:ctor(soldernum)
+function Solders:ctor(soldernum,myorene)
     self.soldernum=soldernum    --兵数量
+    self.myorene=myorene        --我方敌方
     self.solders={}             --兵阵
     self.solderspos={}          --按公式计算单兵初始位置
     self.speed=nil
@@ -29,24 +30,40 @@ function Solders:getType()
 end
 
 function Solders:initSoldersPos()
-    --方形,最多到32个
-    self.rectpos={{0,0},{2,-1},{1,-2},{-1,-1},{-3,0},{-2,1},{-4,2},{-5,1},{-6,0},{-4,-1},
-                   {-2,-2},{0,-3},{2,-4},{3,-3},{4,-2},{6,-3},{5,-4},{4,-5},{3,-6},{1,-5},
-                   {-1,-4},{-3,-3},{-5,-2},{-7,-1},{-9,0},{-8,1},{-7,2},{-6,3},{-8,4},{-9,3},
-                   {-10,2},{-11,1}}
+    if self.myorene=='my' then
+        --我方方形,最多到32个
+        self.rectpos={{0,0},{2,-1},{1,-2},{-1,-1},{-3,0},{-2,1},{-4,2},{-5,1},{-6,0},{-4,-1},
+                      {-2,-2},{0,-3},{2,-4},{3,-3},{4,-2},{6,-3},{5,-4},{4,-5},{3,-6},{1,-5},
+                      {-1,-4},{-3,-3},{-5,-2},{-7,-1},{-9,0},{-8,1},{-7,2},{-6,3},{-8,4},{-9,3},
+                      {-10,2},{-11,1}}
+    else 
+        --敌方方形
+        self.rectpos={{0,0},{2,-1},{3,0},{1,1},{-1,2},{-2,1},{-4,2},{-3,3},{-2,4},{0,3},
+                      {2,2},{4,1},{6,0},{5,-1},{4,-2},{6,-3},{7,-2},{8,-1},{9,0},{7,1},
+                      {5,2},{3,3},{1,4},{-1,5},{-3,6},{-4,5},{-5,4},{-6,3},{-8,4},{-7,5},
+                      {-6,6},{-5,7}}
+    end
     for i=1,#self.rectpos do
-        self.rectpos[i][1]=self.rectpos[i][1]*20
-        self.rectpos[i][2]=self.rectpos[i][2]*20
+        self.rectpos[i][1]=self.rectpos[i][1]*15
+        self.rectpos[i][2]=self.rectpos[i][2]*9
     end
 
-    --楔形，最多到32个
-    self.wedgepos={{0,0},{1,-2},{0,-3},{-1,-1},{-4,-1},{-3,0},{-6,0},{-7,-1},{-8,-2},{-5,-2},
-                  {-2,-2},{-1,-4},{0,-6},{1,-5},{2,-4},{3,-6},{2,-7},{1,-8},{0,-9},{-1,-7},
-                  {-2,-5},{-3,-3},{-6,-3},{-9,-3},{-12,-3},{-11,-2},{-10,-1},{-9,0},{-12,0},{-13,-1},
-                  {-14,-2},{-15,-3}}
+    if self.myorene=='my'then
+        --我方楔形，最多到32个
+        self.wedgepos={{0,0},{1,-2},{0,-3},{-1,-1},{-4,-1},{-3,0},{-6,0},{-7,-1},{-8,-2},{-5,-2},
+                       {-2,-2},{-1,-4},{0,-6},{1,-5},{2,-4},{3,-6},{2,-7},{1,-8},{0,-9},{-1,-7},
+                       {-2,-5},{-3,-3},{-6,-3},{-9,-3},{-12,-3},{-11,-2},{-10,-1},{-9,0},{-12,0},{-13,-1},
+                       {-14,-2},{-15,-3}}
+    else
+        --敌方楔形
+        self.wedgepos={{0,0},{3,0},{4,1},{1,1},{0,3},{-1,2},{-2,4},{-1,5},{0,6},{1,4},
+                       {2,2},{5,2},{8,2},{7,1},{6,0},{9,0},{10,1},{11,2},{12,3},{9,3},
+                       {6,3},{3,3},{2,5},{1,7},{0,9},{-1,8},{-2,7},{-3,6},{-4,8},{-3,9},
+                       {-2,10},{-1,11}}
+    end
     for i=1,#self.wedgepos do
-        self.wedgepos[i][1]=self.wedgepos[i][1]*20
-        self.wedgepos[i][2]=self.wedgepos[i][2]*20  
+        self.wedgepos[i][1]=self.wedgepos[i][1]*15
+        self.wedgepos[i][2]=self.wedgepos[i][2]*9 
     end  
 
     --钳形
@@ -247,11 +264,17 @@ function Solders:runaway(num)
     if self.soldernum-num<=0 or num<=0 then
         return
     end
+    local runx=-30
+    local runy=-50
+    if self.myorene=='ene'then
+        runx=30
+        runy=50
+    end
     if num==1 then
         self.solders[self.soldernum]:runaway()
         transition.moveBy(self.solders[self.soldernum],{time=65/self.solders[self.soldernum].speed,
-                                           x=-30,
-                                           y=-60,
+                                           x=runx,
+                                           y=runy,
                                            onComplete=function()
                                                self:removeChild(self.solders[self.soldernum])
                                                table.remove(self.solders,self.soldernum)
@@ -261,16 +284,16 @@ function Solders:runaway(num)
         self.solders[self.soldernum]:runaway()
         self.solders[self.soldernum-1]:runaway()
         transition.moveBy(self.solders[self.soldernum],{time=65/self.solders[self.soldernum].speed,
-                                           x=-30,
-                                           y=-60,
+                                           x=runx,
+                                           y=runy,
                                            onComplete=function()
                                                self:removeChild(self.solders[self.soldernum])
                                                table.remove(self.solders,self.soldernum)
                                                --transition.fadeOut(self.solders[runkey],{time=1})
                                            end})
         transition.moveBy(self.solders[self.soldernum-1],{time=65/self.solders[self.soldernum-2].speed,
-                                           x=-30,
-                                           y=-60,
+                                           x=runx,
+                                           y=runy,
                                            onComplete=function()
                                                self:removeChild(self.solders[self.soldernum-1])
                                                table.remove(self.solders,self.soldernum-1)

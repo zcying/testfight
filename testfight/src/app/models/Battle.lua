@@ -25,13 +25,13 @@ end
 function Battle:initCard()
     self.battlecard={myhead={typ=Battle.SOLDER_TYPE_HORSE,hp=560,name='mycard1.png',atk,def,pos,speed},
                      mymid={typ=Battle.SOLDER_TYPE_HORSE,hp=600,name='mycard2.png',atk,def,pos,speed},
-                     myfront={typ=Battle.SOLDER_TYPE_HORSE,hp=200,name='mycard3.png',atk,def,pos,speed},
+                     myfront={typ=Battle.SOLDER_TYPE_HORSE,hp=370,name='mycard3.png',atk,def,pos,speed},
                      enehead={typ,hp,atk,def,pos,speed},
                      enemid={typ,hp,atk,def,pos,speed},
-                     enefront={typ,hp,atk,def,pos,speed}}    
+                     enefront={typ=Battle.SOLDER_TYPE_HORSE,hp=580,name='enecard3.png',atk,def,pos,speed}}    
 end
 
---战斗逻辑，生成战报
+--战斗，生成战报
 function Battle:startBattle()
     for _,bp in pairs(self.bettlereport)do
         

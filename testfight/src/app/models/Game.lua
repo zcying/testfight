@@ -6,15 +6,17 @@ local Solders=import(".Solders")
 local CardBase=import('.CardBase')
 local Battle=import('.Battle')
 
-local MYHEADPOS=cc.p(250,200)
-local MYMIDPOS=cc.p(350,300)
-local MYFRONTPOS=cc.p(350,display.cy)
+local MYHEADPOS=cc.p(200,100)
+local MYMIDPOS=cc.p(300,160)
+local MYFRONTPOS=cc.p(400,220)
 local ENEHEADPOS
 local ENEMIDPOS
-local ENEFRONTPOS
+local ENEFRONTPOS=cc.p(700,400)
 
 local MYHEADCARDPOS=cc.p(50,display.height-50)
-local MYMIDCARDPO=cc.p(150,display.height-50)
+local MYMIDCARDPOS=cc.p(150,display.height-50)
+local MYFRONTCARDPOS=cc.p(250,display.height-50)
+local ENEFRONTCARDPOS=cc.p(display.width-200,50)
 
 function Game:ctor()
     math.randomseed(os.time())
@@ -33,9 +35,10 @@ function Game:ctor()
         :addNodeEventListener(cc.NODE_TOUCH_EVENT,
                               function(event)
                                 if event.name=='ended' then
-                                    self.myhead.solders:moveForward(100,50)
-                                    self.mymid.solders:moveForward(100,50)
-                                    --self.myfront.solders:moveForward(100,0)
+                                    self.myhead.solders:moveForward(100,60)
+                                    self.mymid.solders:moveForward(100,60)
+                                    self.myfront.solders:moveForward(100,60)
+                                    self.enefront.solders:moveForward(-100,-60)
                                 end
                                 return true
                               end)
@@ -51,7 +54,8 @@ function Game:ctor()
                                 if event.name=='ended' then
                                     self.myhead.solders:attack()
                                     self.mymid.solders:attack()
-                                    --self.myfront.solders:attack()
+                                    self.myfront.solders:attack()
+                                    self.enefront.solders:attack()
                                 end
                                 return true
                               end)
@@ -67,7 +71,8 @@ function Game:ctor()
                                 if event.name=='ended' then
                                     self.myhead.solders:runaway(math.random(1,3))
                                     self.mymid.solders:runaway(math.random(1,3))
-                                    --self.myfront.solders:runaway(math.random(1,3))
+                                    self.myfront.solders:runaway(math.random(1,3))
+                                    self.enefront.solders:runaway(math.random(1,3))
                                 end
                                 return true
                               end)
@@ -83,7 +88,8 @@ function Game:ctor()
                                 if event.name=='ended' then
                                     self.myhead.solders:die(math.random(1,3))
                                     self.mymid.solders:die(math.random(1,3))
-                                    --self.myfront.solders:die(math.random(1,3))
+                                    self.myfront.solders:die(math.random(1,3))
+                                    self.enefront.solders:die(math.random(1,3))
                                 end
                                 return true
                               end)
@@ -99,7 +105,8 @@ function Game:ctor()
                                 if event.name=='ended' then
                                     self.myhead.solders:reformat()
                                     self.mymid.solders:reformat()
-                                    --self.myfront.solders:reformat()
+                                    self.myfront.solders:reformat()
+                                    self.enefront.solders:reformat()
                                 end
                                 return true
                               end)
@@ -115,7 +122,8 @@ function Game:ctor()
                                 if event.name=='ended' then
                                     self.myhead.solders:toRect()
                                     self.mymid.solders:toRect()
-                                    --self.myfront.solders:reformat()
+                                    self.myfront.solders:toRect()
+                                    self.enefront.solders:toRect()
                                 end
                                 return true
                               end)
@@ -131,7 +139,8 @@ function Game:ctor()
                                 if event.name=='ended' then
                                     self.myhead.solders:toWedge()
                                     self.mymid.solders:toWedge()
-                                    --self.myfront.solders:reformat()
+                                    self.myfront.solders:toWedge()
+                                    self.enefront.solders:toWedge()
                                 end
                                 return true
                               end)
@@ -152,7 +161,7 @@ function Game:ctor()
 --                                return true
 --                              end)
         self.lable8=cc.ui.UILabel.new({
-            text='1hurt25hp',
+            text='my1hurt25hp',
             x=display.width-500,
             y=display.height-100,
             size=32})
@@ -170,9 +179,9 @@ function Game:ctor()
                                       return true
                                   end)
             self.lable8=cc.ui.UILabel.new({
-            text='2hurt25hp',
+            text='my2hurt25hp',
             x=display.width-500,
-            y=display.height-200,
+            y=display.height-150,
             size=32})
             :addTo(self)
             :setTouchEnabled(true)
@@ -238,18 +247,19 @@ function Game:onEnter()
 end
 
 function Game:initCardsPara()--从battle获取card的初始参数
-    self.myhead={cardpara=self.battle:getCardbyKey('myhead'),card,solders}--我军大本营
-    self.mymid={cardpara=self.battle:getCardbyKey('mymid'),card,solders}  --中军
-    self.myfront={cardpara=self.battle:getCardbyKey('myfront')}--前锋
+    self.myhead={cardpara=self.battle:getCardbyKey('myhead'),card,solders,myorene='my'}--我军大本营
+    self.mymid={cardpara=self.battle:getCardbyKey('mymid'),card,solders,myorene='my'}  --中军
+    self.myfront={cardpara=self.battle:getCardbyKey('myfront'),card,solders,myorene='my'}--前锋
     self.enehead={cardpara=self.battle:getCardbyKey('enehead')}--敌军
     self.enemid={cardpara=self.battle:getCardbyKey('enemid')}  
-    self.enefront={cardpara=self.battle:getCardbyKey('enefront')}
+    self.enefront={cardpara=self.battle:getCardbyKey('enefront'),card,solders,myorene='ene'}
 end
 
 function Game:initSoldersAndCards()--初始化card和solders
     self:addSoldersOnCard(self.myhead,MYHEADPOS,MYHEADCARDPOS)
-    self:addSoldersOnCard(self.mymid,MYMIDPOS,MYMIDCARDPO)
-    --self:addSoldersOnCard(self.myfront,MYFRONTPOS)
+    self:addSoldersOnCard(self.mymid,MYMIDPOS,MYMIDCARDPOS)
+    self:addSoldersOnCard(self.myfront,MYFRONTPOS,MYFRONTCARDPOS)
+    self:addSoldersOnCard(self.enefront,ENEFRONTPOS,ENEFRONTCARDPOS)
 end
 
 --根据卡牌类别添加兵阵
@@ -257,11 +267,14 @@ end
 --卡牌类型：兵种：速度、攻击距离等
 --soc:solders on card,a table including cardparameter,solders and card
 function Game:addSoldersOnCard(soc,solderpos,cardpos)
-    soc.card=CardBase.new(soc.cardpara.hp,soc.cardpara.name)
+    local myorene=soc.myorene
+    local hp=soc.cardpara.hp
+    local name=soc.cardpara.name
+    soc.card=CardBase.new(hp,name,myorene)
                     :pos(cardpos.x,cardpos.y)
                     :addTo(self)
     local soldernum=Game:getSolderNum(soc.card:getHp())
-    soc.solders=Solders.new(soldernum)
+    soc.solders=Solders.new(soldernum,myorene)
                     :pos(solderpos.x,solderpos.y)
                     :addTo(self)    
 end
