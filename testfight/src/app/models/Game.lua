@@ -16,7 +16,9 @@ local ENEFRONTPOS=cc.p(700,400)
 local MYHEADCARDPOS=cc.p(50,display.height-50)
 local MYMIDCARDPOS=cc.p(150,display.height-50)
 local MYFRONTCARDPOS=cc.p(250,display.height-50)
-local ENEFRONTCARDPOS=cc.p(display.width-200,50)
+local ENEHEADCARDPOS
+local ENEMIDCARDPOS
+local ENEFRONTCARDPOS=cc.p(display.width-250,50)
 
 function Game:ctor()
     math.randomseed(os.time())
@@ -35,9 +37,9 @@ function Game:ctor()
         :addNodeEventListener(cc.NODE_TOUCH_EVENT,
                               function(event)
                                 if event.name=='ended' then
-                                    self.myhead.solders:moveForward(100,60)
-                                    self.mymid.solders:moveForward(100,60)
-                                    self.myfront.solders:moveForward(100,60)
+                                    self.myhead.solders:moveForward(-10,183)
+                                    self.mymid.solders:moveForward(310,-3)
+                                    self.myfront.solders:moveForward(0,0)
                                     self.enefront.solders:moveForward(-100,-60)
                                 end
                                 return true
