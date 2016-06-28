@@ -10,7 +10,8 @@ function Battle:ctor()
     --卡牌初始化
     self:initCard()
     --战报，共8回合
-    self.bettlereport={{round=1,},
+    self.bettlereport={{round=0,},
+                       {round=1,},
                        {round=2,},
                        {round=3,},
                        {round=4,},
@@ -23,12 +24,12 @@ function Battle:ctor()
 end
 
 function Battle:initCard()
-    self.battlecard={myhead={typ=Battle.SOLDER_TYPE_HORSE,hp=480,name='mycard1.png',atk,def,pos,speed},
-                     mymid={typ=Battle.SOLDER_TYPE_HORSE,hp=480,name='mycard2.png',atk,def,pos,speed},
-                     myfront={typ=Battle.SOLDER_TYPE_HORSE,hp=580,name='mycard3.png',atk,def,pos,speed},
+    self.battlecard={myhead={typ=Battle.SOLDER_TYPE_HORSE,hp=480,cardname='mycard1.png',atk,def,pos,speed},
+                     mymid={typ=Battle.SOLDER_TYPE_HORSE,hp=480,cardname='mycard2.png',atk,def,pos,speed},
+                     myfront={typ=Battle.SOLDER_TYPE_HORSE,hp=580,cardname='mycard3.png',atk,def,pos,speed},
                      enehead={typ,hp,atk,def,pos,speed},
                      enemid={typ,hp,atk,def,pos,speed},
-                     enefront={typ=Battle.SOLDER_TYPE_HORSE,hp=580,name='enecard3.png',atk,def,pos,speed}}    
+                     enefront={typ=Battle.SOLDER_TYPE_HORSE,hp=580,cardname='enecard3.png',atk,def,pos,speed}}    
 end
 
 --战斗，生成战报

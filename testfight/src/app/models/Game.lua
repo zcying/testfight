@@ -271,8 +271,8 @@ end
 function Game:addSoldersOnCard(soc,solderpos,cardpos)
     local myorene=soc.myorene
     local hp=soc.cardpara.hp
-    local name=soc.cardpara.name
-    soc.card=CardBase.new(hp,name,myorene)
+    local cardname=soc.cardpara.cardname
+    soc.card=CardBase.new(hp,cardname,myorene)
                     :pos(cardpos.x,cardpos.y)
                     :addTo(self)
     local soldernum=Game:getSolderNum(soc.card:getHp())
