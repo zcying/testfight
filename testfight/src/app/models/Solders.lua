@@ -79,6 +79,7 @@ end
 function Solders:initSolders()
     for i=1,self.soldernum do
         if self.typ==Solders.SOLDERS_TYPE_HORSE then
+            --printLog(self.myorene)
             self.solders[i]=SolderHorse.new(self.myorene)
         elseif self.typ==Solders.SOLDERS_TYPE_ARCHER then 
             self.solders[i]=SolderArcher.new(self.myorene)

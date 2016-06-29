@@ -10,27 +10,24 @@ function SolderInfantry:ctor(myorene)
 end
 
 function SolderInfantry:getSolderName()
-    if self.myorene=='my' then
-        return 'myinf.png'
-    else 
-        return 'eneinf.png'
-    end
+--    if self.myorene=='my' then
+--        return 'myinf.png'
+--    else 
+--        return 'eneinf.png'
+--    end
+    return self.myorene..'inf.png'
 end
 
 function SolderInfantry:getAniWalkName()
-    if self.myorene=='my' then
-        return 'myinfwalk'
-    else 
-        return 'eneinfwalk'
-    end
+    return self.myorene..'infwalk'
 end
 
 function SolderInfantry:getAniAtkName()
-        return self.myorene..'infatk'
+    return self.myorene..'infatk'
 end
 
 function SolderInfantry:getDeadName()
-        return self.myorene..'infdie'
+    return self.myorene..'infdie.png'
 end
 
 return SolderInfantry

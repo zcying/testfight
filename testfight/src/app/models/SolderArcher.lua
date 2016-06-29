@@ -10,35 +10,24 @@ function SolderArcher:ctor(myorene)
 end
 
 function SolderArcher:getSolderName()
-    if self.myorene=='my' then
-        return 'myarcher.png'
-    else 
-        return 'enearcher.png'
-    end
+    return self.myorene..'archer.png'
 end
 
 function SolderArcher:getAniWalkName()
-    if self.myorene=='my' then
-        return 'myarcherwalk'
-    else 
-        return 'enearcherwalk'
-    end
+    return self.myorene..'archerwalk'
 end
 
 function SolderArcher:getAniAtkName()
-    if self.myorene=='my' then
-        return 'myarcheratk'
-    else 
-        return 'enearcheratk'
-    end
+    return self.myorene..'archeratk'
 end
 
 function SolderArcher:getDeadName()
-    if self.myorene=='my' then
-        return 'myarcherdie'
-    else 
-        return 'enearcherdie'
-    end
+--    if self.myorene=='my' then
+--        return 'myarcherdie'
+--    else 
+--        return 'enearcherdie'
+--    end
+    return self.myorene..'archerdie.png'
 end
 
 return SolderArcher

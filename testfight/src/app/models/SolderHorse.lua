@@ -3,19 +3,22 @@ local SolderBase=import(".SolderBase")
 local SolderHorse = class("SolderHorse",SolderBase)
 
 
-function SolderHorse:ctor(myorene)
+function SolderHorse:ctor()
     SolderHorse.super.ctor(self)
     self.speed=800
-    self.myorene=myorene
+    self.myorene=SolderHorse.super.myorene
     self.soldertype=SolderBase.SOLDER_TYPE_HORSE
 end
 
 function SolderHorse:getSolderName()
     if self.myorene=='my' then
+        printLog(self.myorene) 
         return 'solder.png'
-    else 
+    else
+        printLog(self.myorene) 
         return 'solder.png'
     end
+    
 end
 
 function SolderHorse:getAniWalkName()
