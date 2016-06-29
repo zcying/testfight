@@ -8,14 +8,17 @@ Solders.SOLDERS_TYPE_INFANTRY=3
 
 local SolderBase=import(".SolderBase")
 local SolderHorse=import(".SolderHorse")
-function Solders:ctor(soldernum,myorene)
+local SolderArcher=import(".SolderArcher")
+local SolderInfantry=import(".SolderInfantry")
+function Solders:ctor(soldernum,myorene,typ)
     self.soldernum=soldernum    --兵数量
+    self.typ=typ                --兵种
     self.myorene=myorene        --我方敌方
     self.solders={}             --兵阵
-    self.solderspos={}          --按公式计算单兵初始位置
+    self.solderspos={}          --单兵初始位置
     self.speed=nil
-    self.solderstype=Solders.SOLDERS_TYPE_HORSE --方阵兵种
-    self:initSoldersPos()
+    --self.solderstype=Solders.SOLDERS_TYPE_HORSE --方阵兵种
+    self:initSoldersPos()--初始化点位
     self:initSolders()--初始化兵阵
     
 end
@@ -26,7 +29,7 @@ function Solders:getSoldernum()
 end
 
 function Solders:getType()
-    return self.solderstype
+    return self.typ
 end
 
 function Solders:initSoldersPos()
@@ -75,10 +78,13 @@ end
 --初始化兵阵，取得初始点位
 function Solders:initSolders()
     for i=1,self.soldernum do
-        --self.solders[i]=display.newSprite(SolderBase:getSolderName())
-        self.solders[i]=SolderHorse.new()
-        :align(display.CENTER)
-
+        if self.typ==Solders.SOLDERS_TYPE_HORSE then
+            self.solders[i]=SolderHorse.new(self.myorene)
+        elseif self.typ==Solders.SOLDERS_TYPE_ARCHER then 
+            self.solders[i]=SolderArcher.new(self.myorene)
+        else
+            self.solders[i]=SolderInfantry.new(self.myorene)
+        end
 --        --按公式排布
 --        local x=-30*(1+(math.ceil((i+2)/4-1)%2))
 --        local y=30*(1-2*(i%2))*(math.ceil((i+4)/4)-1)
@@ -89,7 +95,8 @@ function Solders:initSolders()
         --按方形排
         local x=self.rectpos[i][1]
         local y=self.rectpos[i][2]
-        self.solders[i]:pos(x,y)
+        self.solders[i]:align(display.CENTER)
+                       :pos(x,y)
                        :addTo(self)
                        :walk()
 --        local x=self.wedgepos[i][1]

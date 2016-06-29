@@ -8,7 +8,8 @@ SolderBase.SOLDER_TYPE_ARCHER=2
 SolderBase.SOLDER_TYPE_INFANTRY=3
 
 
-function SolderBase:ctor()
+function SolderBase:ctor(myorene)
+    self.myorene=myorene
     self.sprite=display.newSprite(self:getSolderName()):addTo(self)
     --self.sprite=display.newSprite():addTo(self)
     --self.soldertype=SolderBase.SOLDER_TYPE_HORSE

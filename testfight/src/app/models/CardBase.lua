@@ -7,9 +7,10 @@ CardBase.SOLDER_TYPE_HORSE=1
 CardBase.SOLDER_TYPE_ARCHER=2
 CardBase.SOLDER_TYPE_INFANTRY=3
 
-function CardBase:ctor(hp,cardname,myorene)
-    --self.soldertype=nil
+function CardBase:ctor(hp,cardname,myorene,typ)
+    
     self.hp=hp
+    self.typ=typ
     --self.def=def
     --self.atk=atk
     self.myorene=myorene 
@@ -38,7 +39,7 @@ function CardBase:setHp(hp,rate)
 end
 
 function CardBase:getType()
-    return self.soldertype
+    return self.typ
 end
 
 function CardBase:attack()
