@@ -26,6 +26,10 @@ function CardBase:ctor(hp,cardname,myorene,typ)
                                    size=16})
                                  :align(display.CENTER)
                                  :addTo(self)
+    self.sx=self.sprite:getPositionX()
+    self.sy=self.sprite:getPositionY()
+    self.hx=self.hplabel:getPositionX()
+    self.hy=self.hplabel:getPositionY()
    --scheduler.scheduleGlobal(self.update,0.1)
 end
 
@@ -43,9 +47,23 @@ function CardBase:getType()
 end
 
 function CardBase:attack()
-
+    local sx=self.sprite:getPositionX()
+    local hx=sx
+    local sy=self.sprite:getPositionY()-30
+    local hy=self.hplabel:getPositionY()-40
+    if self.myorene=='ene'then
+        sy=sy+60
+        hy=hy+80
+    end
+    self.sprite:pos(sx,sy)
+               :setScale(1.2)
+    self.hplabel:pos(hx,hy)
 end
 
-
+function CardBase:back()
+    self.sprite:pos(self.sx,self.sy)
+               :setScale(1)
+    self.hplabel:pos(self.hx,self.hy)
+end
 
 return CardBase

@@ -34,12 +34,12 @@ function Battle:ctor()
 end
 
 function Battle:initCard()
-    self.battlecard={myhead={typ=Battle.SOLDER_TYPE_HORSE,hp=480,cardname='mycard1.png',atk,def,pos,speed},
-                     mymid={typ=Battle.SOLDER_TYPE_HORSE,hp=480,cardname='mycard2.png',atk,def,pos,speed},
-                     myfront={typ=Battle.SOLDER_TYPE_HORSE,hp=580,cardname='mycard3.png',atk,def,pos,speed},
-                     enehead={typ=Battle.SOLDER_TYPE_HORSE,hp=1080,cardname='enecard1.png',atk,def,pos,speed},
-                     enemid={typ=Battle.SOLDER_TYPE_HORSE,hp=760,cardname='enecard2.png',atk,def,pos,speed},
-                     enefront={typ=Battle.SOLDER_TYPE_HORSE,hp=580,cardname='enecard3.png',atk,def,pos,speed}}    
+    self.battlecard={myhead={typ=Battle.SOLDER_TYPE_HORSE,hp=7100,cardname='mycard1.png',atk,def,pos,speed},
+                     mymid={typ=Battle.SOLDER_TYPE_INFANTRY,hp=7700,cardname='mycard2.png',atk,def,pos,speed},
+                     myfront={typ=Battle.SOLDER_TYPE_ARCHER,hp=6600,cardname='mycard3.png',atk,def,pos,speed},
+                     enehead={typ=Battle.SOLDER_TYPE_ARCHER,hp=3257,cardname='enecard1.png',atk,def,pos,speed},
+                     enemid={typ=Battle.SOLDER_TYPE_INFANTRY,hp=3257,cardname='enecard2.png',atk,def,pos,speed},
+                     enefront={typ=Battle.SOLDER_TYPE_HORSE,hp=3257,cardname='enecard3.png',atk,def,pos,speed}}    
 end
 
 --战斗，生成战报

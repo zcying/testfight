@@ -10,13 +10,14 @@ SolderBase.SOLDER_TYPE_INFANTRY=3
 
 function SolderBase:ctor(myorene)
     self.myorene=myorene
-    self.sprite=display.newSprite(self:getSolderName()):addTo(self)
+    --self.sprite=display.newSprite(self:getSolderName()):addTo(self)
     --self.sprite=display.newSprite():addTo(self)
     --self.soldertype=SolderBase.SOLDER_TYPE_HORSE
     self.soldertype=nil
     self.speed=200
     self.aninamewalk=self:getAniWalkName()
     self.aninameatk=self:getAniAtkName()
+    self.aninamesty=self:getAniStyName()
     self.aninameDead=self:getDeadName()
     self:addAnimationCache()
 end
@@ -24,15 +25,19 @@ end
 --function SolderBase:getSolderName()
 --    return 'solder.png'
 --end
-function SolderBase:getSolderName()
-    return 
-end
+--function SolderBase:getSolderName()
+--    return 
+--end
 
 function SolderBase:getAniWalkName()
     return 
 end
 
 function SolderBase:getAniAtkName()
+    return
+end
+
+function SolderBase:getAniStyName()
     return
 end
 
@@ -53,9 +58,9 @@ function SolderBase:walk()
 --    local function move(dt)
 --        transition.moveBy(self,{time=0.2,x=20,y=15})
 --    end
-    if self.sprite then
-        self:removeChild(self.sprite)
-    end
+--    if self.sprite then
+--        self:removeChild(self.sprite)
+--    end
     self:stop()
     self.aniaction=transition.playAnimationForever(self,display.getAnimationCache(self.aninamewalk))
     self.aniaction:setTag(2)
@@ -64,11 +69,18 @@ end
 
 --单兵攻击
 function SolderBase:attack()
-    if self.sprite then 
-        self:removeChild(self.sprite)
-    end
+--    if self.sprite then 
+--        self:removeChild(self.sprite)
+--    end
     self:stop()
     self.aniaction=transition.playAnimationForever(self,display.getAnimationCache(self.aninameatk))
+    self.aniaction:setTag(2)
+end
+
+--单兵待命
+function SolderBase:steady()
+    self:stop()
+    self.aniaction=transition.playAnimationForever(self,display.getAnimationCache(self.aninamesty))
     self.aniaction:setTag(2)
 end
 
@@ -93,14 +105,20 @@ end
 --动画缓存
 function SolderBase:addAnimationCache()
     display.addSpriteFrames(self.aninamewalk..'.plist',self.aninamewalk..'.png')
-    local frameswalk=display.newFrames(self.aninamewalk..'0%d.png',1,2)
-    local animationwalk=display.newAnimation(frameswalk,0.1)
+    local frameswalk=display.newFrames(self.aninamewalk..'0%d.png',1,6)
+    local animationwalk=display.newAnimation(frameswalk,2/15)
     display.setAnimationCache(self.aninamewalk,animationwalk)--走路动画
 
     display.addSpriteFrames(self.aninameatk..'.plist',self.aninameatk..'.png')
-    local framesatk=display.newFrames(self.aninameatk..'0%d.png',1,2)
-    local animationatk=display.newAnimation(framesatk,0.1)
+    local framesatk=display.newFrames(self.aninameatk..'0%d.png',1,6)
+    local animationatk=display.newAnimation(framesatk,2/15)
     display.setAnimationCache(self.aninameatk,animationatk)--攻击动画
+
+    display.addSpriteFrames(self.aninamesty..'.plist',self.aninamesty..'.png')
+    local framesty=display.newFrames(self.aninamesty..'0%d.png',1,7)
+    local animationsty=display.newAnimation(framesty,1/12)
+    display.setAnimationCache(self.aninamesty,animationsty)--待命动画
+
 end
 
 --逃跑，实际就是walk

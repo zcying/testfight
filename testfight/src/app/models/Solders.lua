@@ -38,13 +38,15 @@ function Solders:initSoldersPos()
         self.rectpos={{0,0},{2,-1},{1,-2},{-1,-1},{-3,0},{-2,1},{-4,2},{-5,1},{-6,0},{-4,-1},
                       {-2,-2},{0,-3},{2,-4},{3,-3},{4,-2},{6,-3},{5,-4},{4,-5},{3,-6},{1,-5},
                       {-1,-4},{-3,-3},{-5,-2},{-7,-1},{-9,0},{-8,1},{-7,2},{-6,3},{-8,4},{-9,3},
-                      {-10,2},{-11,1}}
+                      {-10,2},{-11,1},{-12,0},{-10,-1},{-8,-2},{-6,-3},{-4,-4},{-2,-5},{0,-6},{2,-7},
+                      {5,-7},{6,-6},{7,-5},{8,-4}}
     else 
         --敌方方形
         self.rectpos={{0,0},{2,-1},{3,0},{1,1},{-1,2},{-2,1},{-4,2},{-3,3},{-2,4},{0,3},
                       {2,2},{4,1},{6,0},{5,-1},{4,-2},{6,-3},{7,-2},{8,-1},{9,0},{7,1},
                       {5,2},{3,3},{1,4},{-1,5},{-3,6},{-4,5},{-5,4},{-6,3},{-8,4},{-7,5},
-                      {-6,6},{-5,7}}
+                      {-6,6},{-5,7},{-4,8},{-2,7},{0,6},{2,5},{4,4},{6,3},{8,2},{10,1},
+                      {11,-1},{10,-2},{9,-3},{8,-4}}
     end
     for i=1,#self.rectpos do
         self.rectpos[i][1]=self.rectpos[i][1]*15
@@ -56,13 +58,15 @@ function Solders:initSoldersPos()
         self.wedgepos={{0,0},{1,-2},{0,-3},{-1,-1},{-4,-1},{-3,0},{-6,0},{-7,-1},{-8,-2},{-5,-2},
                        {-2,-2},{-1,-4},{0,-6},{1,-5},{2,-4},{3,-6},{2,-7},{1,-8},{0,-9},{-1,-7},
                        {-2,-5},{-3,-3},{-6,-3},{-9,-3},{-12,-3},{-11,-2},{-10,-1},{-9,0},{-12,0},{-13,-1},
-                       {-14,-2},{-15,-3}}
+                       {-14,-2},{-15,-3},{-16,-4},{-13,-4},{-10,-4},{-7,-4},{-4,-4},{-3,-6},{-2,-8},{-1,-10},
+                       {1,-11},{2,-10},{3,-9},{4,-8}}
     else
         --敌方楔形
         self.wedgepos={{0,0},{3,0},{4,1},{1,1},{0,3},{-1,2},{-2,4},{-1,5},{0,6},{1,4},
                        {2,2},{5,2},{8,2},{7,1},{6,0},{9,0},{10,1},{11,2},{12,3},{9,3},
                        {6,3},{3,3},{2,5},{1,7},{0,9},{-1,8},{-2,7},{-3,6},{-4,8},{-3,9},
-                       {-2,10},{-1,11}}
+                       {-2,10},{-1,11},{0,12},{1,10},{2,8},{3,6},{4,4},{7,4},{10,4},{13,4},
+                       {15,3},{14,2},{13,1},{12,0}}
     end
     for i=1,#self.wedgepos do
         self.wedgepos[i][1]=self.wedgepos[i][1]*15
@@ -90,7 +94,7 @@ function Solders:initSolders()
 --        local x=-30*(1+(math.ceil((i+2)/4-1)%2))
 --        local y=30*(1-2*(i%2))*(math.ceil((i+4)/4)-1)
 
---        --按楔形排
+        --按楔形排
 --        local x=self.wedgepos[i][1]
 --        local y=self.wedgepos[i][2]
         --按方形排
@@ -99,7 +103,7 @@ function Solders:initSolders()
         self.solders[i]:align(display.CENTER)
                        :pos(x,y)
                        :addTo(self)
-                       :walk()
+                       :steady()
 --        local x=self.wedgepos[i][1]
 --        local y=self.wedgepos[i][2]
 --        local x=self.rectpos[i][1]
@@ -182,14 +186,14 @@ function Solders:moveForward(px,py)
             self.wedgepos[i][2]=self.wedgepos[i][2]+py
         end
         for _,k in pairs(self.solders) do--整体前进
+            k:walk()
             k.moveAciton=transition.moveBy(k,{time=math.sqrt(px*px+py*py)/self.speed,
                                               x=px,y=py,
---                                              onComplete=function()
---                                                 k:stop()
---                                              end
+                                              onComplete=function()
+                                                 k:steady()
+                                              end
                                              })
                 :setTag(1)
-            k:walk()
         end
     --end
 end
@@ -239,10 +243,10 @@ end
 
 
 --按实际数量像死一样跑
-function Solders:runawayAll(runnum)
-    if runnum<=0 then
-        return
-    end
+--function Solders:runawayAll(runnum)
+--    if runnum<=0 then
+--        return
+--    end
 --    self:getSoldernum()
 --    if self.soldernum-runnum<=0 then
 --        return
@@ -264,7 +268,7 @@ function Solders:runawayAll(runnum)
 --                                               --transition.fadeOut(self.solders[runkey],{time=1})
 --                                           end})
 --    end
-end
+--end
 
 --逃兵，逃最后两个意思一下，其余逃兵按死亡展现
 function Solders:runaway(num)
@@ -310,6 +314,31 @@ function Solders:runaway(num)
                                                self:die(num-2)
                                                --transition.fadeOut(self.solders[runkey],{time=1})
                                            end})    
+    end
+end
+
+--英雄不朽
+function Solders:herosNeverDie(num)
+    self:getSoldernum()
+    for i=self.soldernum+1,self.soldernum+num do
+        if self.typ==Solders.SOLDERS_TYPE_HORSE then
+            self.solders[i]=SolderHorse.new(self.myorene)
+        elseif self.typ==Solders.SOLDERS_TYPE_ARCHER then 
+            self.solders[i]=SolderArcher.new(self.myorene)
+        else
+            self.solders[i]=SolderInfantry.new(self.myorene)
+        end
+        local x=self.rectpos[i][1]
+        local y=self.rectpos[i][2]
+        self.solders[i]:align(display.CENTER)
+                       :pos(x,y)
+                       :addTo(self)
+                       :walk()
+--        local x=self.wedgepos[i][1]
+--        local y=self.wedgepos[i][2]
+--        local x=self.rectpos[i][1]
+--        local y=self.rectpos[i][2]
+        self.solderspos[i]=cc.p(x,y)
     end
 end
 

@@ -44,18 +44,20 @@ local ENELONGHALFRIGHTPOS=cc.p(820,364)
 
 --卡牌点位
 local MYHEADCARDPOS=cc.p(50,display.height-50)
-local MYMIDCARDPOS=cc.p(150,display.height-50)
-local MYFRONTCARDPOS=cc.p(250,display.height-50)
+local MYMIDCARDPOS=cc.p(140,display.height-50)
+local MYFRONTCARDPOS=cc.p(230,display.height-50)
 local ENEHEADCARDPOS=cc.p(display.width-50,50)
-local ENEMIDCARDPOS=cc.p(display.width-150,50)
-local ENEFRONTCARDPOS=cc.p(display.width-250,50)
+local ENEMIDCARDPOS=cc.p(display.width-140,50)
+local ENEFRONTCARDPOS=cc.p(display.width-230,50)
 
 function Game:ctor()
     math.randomseed(os.time())
+    self.background=display.newSprite('background.jpg')
+        :pos(display.cx,display.cy)
+        :addTo(self)
     self.battle=Battle:new()
     self:initCardsPara()
     self:initSoldersAndCards()
-    
     --testlable
     self.lable1=cc.ui.UILabel.new({--前进
         text='moveforward',
@@ -66,8 +68,9 @@ function Game:ctor()
         :setTouchEnabled(true)
         :addNodeEventListener(cc.NODE_TOUCH_EVENT,
                               function(event)
-                                local mfx=MYCLOSEMIDPOS.x-MYFRONTPOS.x
-                                local mfy=MYCLOSEMIDPOS.y-MYFRONTPOS.y
+--                                local mfx=MYCLOSEMIDPOS.x-MYFRONTPOS.x
+--                                local mfy=MYCLOSEMIDPOS.y-MYFRONTPOS.y
+                                local mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEMIDPOS)
                                 local mmx=MYLONGHALFLEFTPOS.x-MYMIDPOS.x
                                 local mmy=MYLONGHALFLEFTPOS.y-MYMIDPOS.y
                                 local mhx=MYLONGHALFRIGHTPOS.x-MYHEADPOS.x
@@ -88,6 +91,7 @@ function Game:ctor()
                                 end
                                 return true
                               end)
+
    self.lable2=cc.ui.UILabel.new({--攻击
         text='attack',
         x=display.width-300,
@@ -107,6 +111,7 @@ function Game:ctor()
                                 end
                                 return true
                               end)
+
    self.lable3=cc.ui.UILabel.new({--逃跑
         text='runaway',
         x=display.width-300,
@@ -126,6 +131,7 @@ function Game:ctor()
                                 end
                                 return true
                               end)
+
    self.lable4=cc.ui.UILabel.new({--死
         text='solderdie',
         x=display.width-300,
@@ -145,6 +151,7 @@ function Game:ctor()
                                 end
                                 return true
                               end)
+
    self.lable5=cc.ui.UILabel.new({--整队
         text='reformat',
         x=display.width-300,
@@ -164,6 +171,7 @@ function Game:ctor()
                                 end
                                 return true
                               end)
+
         self.lable6=cc.ui.UILabel.new({--变成方阵
          text='toRect',
          x=display.width-300,
@@ -183,6 +191,7 @@ function Game:ctor()
                                 end
                                 return true
                               end)
+
        self.lable6=cc.ui.UILabel.new({--变成楔形
         text='toWedge',
         x=display.width-300,
@@ -236,7 +245,8 @@ function Game:ctor()
                                       end
                                       return true
                                   end)
-            self.lable8=cc.ui.UILabel.new({
+
+        self.lable9=cc.ui.UILabel.new({
             text='my2hurt25hp',
             x=display.width-500,
             y=display.height-150,
@@ -254,6 +264,54 @@ function Game:ctor()
                                       end
                                       return true
                                   end)
+
+       self.lable10=cc.ui.UILabel.new({--变成楔形
+        text='herosneverdie',
+        x=display.width-300,
+        y=display.height-450,
+        size=32})
+        :addTo(self)
+        :setTouchEnabled(true)
+        :addNodeEventListener(cc.NODE_TOUCH_EVENT,
+                              function(event)
+                                if event.name=='ended' then
+                                    self.myhead.solders:herosNeverDie(math.random(1,3))
+                                    self.mymid.solders:herosNeverDie(math.random(1,3))
+                                    self.myfront.solders:herosNeverDie(math.random(1,3))
+                                    self.enehead.solders:herosNeverDie(math.random(1,3))
+                                    self.enemid.solders:herosNeverDie(math.random(1,3))
+                                    self.enefront.solders:herosNeverDie(math.random(1,3))
+                                end
+                                return true
+                              end)
+
+        self.button1=cc.ui.UIPushButton.new("solder.png")
+        :pos(display.width-300,display.height-500)
+        :onButtonPressed(function (event)
+            self.myhead.card:attack()
+            self.enefront.card:attack()
+            --return true
+        end)
+        :onButtonRelease(function(event)
+            self.myhead.card:back()
+            self.enefront.card:back()
+        end)
+        :addTo(self)
+
+       self.lable10=cc.ui.UILabel.new({
+        text='getready',
+        x=display.width-300,
+        y=display.height-550,
+        size=32})
+        :addTo(self)
+        :setTouchEnabled(true)
+        :addNodeEventListener(cc.NODE_TOUCH_EVENT,
+                              function(event)
+                                if event.name=='ended' then
+                                    self:getReady()
+                                end
+                                return true
+                              end)
 --   self.lable4=cc.ui.UILabel.new({
 --        text='runaway2',
 --        x=display.width-300,
@@ -335,6 +393,7 @@ function Game:addSoldersOnCard(soc,solderpos,cardpos)
                     :pos(cardpos.x,cardpos.y)
                     :addTo(self)
     local soldernum=Game:getSolderNum(soc.card:getHp())
+    --printLog(myorene)
     soc.solders=Solders.new(soldernum,myorene,soc.card:getType())
                     :pos(solderpos.x,solderpos.y)
                     :addTo(self)    
@@ -359,6 +418,65 @@ function Game:getSolderNum(cardhp)
         return math.ceil(hp/1000)+33
     else return 44
     end        
+end
+
+--moveby距离
+function Game:getDis(posfrom,posto)
+    return posto.x-posfrom.x, posto.y-posfrom.y
+end
+
+--到初始站位
+function Game:getReady()
+    local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy
+    local mf=self.myfront.card:getType()
+    local mm=self.mymid.card:getType()
+    local mh=self.myhead.card:getType()
+    local ef=self.enefront.card:getType()
+    local em=self.enemid.card:getType()
+    local eh=self.enehead.card:getType()
+    if mf==2 and mm==2 and mh==2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGMIDPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYLONGRIGHTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYLONGLEFTPOS)
+    elseif mf==2 and mm~=2 and mh==2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGHALFRIGHTPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEMIDPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYLONGHALFLEFTPOS)
+    elseif mf==2 and mm==2 and mh~=2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGHALFRIGHTPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYLONGHALFLEFTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEMIDPOS)
+    elseif mf==2 and mm~=2 and mh~=2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGMIDPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEHALFRIGHTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEHALFLEFTPOS)
+    elseif mf~=2 and mm==2 and mh==2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEMIDPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYLONGHALFRIGHTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYLONGHALFLEFTPOS)
+    elseif mf~=2 and mm~=2 and mh==2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEHALFRIGHTPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEHALFLEFTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYLONGMIDPOS)
+    elseif mf~=2 and mm==2 and mh~=2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEHALFRIGHTPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYLONGMIDPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEHALFLEFTPOS)
+    else
+        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEMIDPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSERIGHTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSELEFTPOS)
+    end
+    if ef==2 and em==2 and eh==2 then
+        
+    end
+    self.myfront.solders:moveForward(mfx,mfy)
+    self.mymid.solders:moveForward(mmx,mmy)
+    self.myhead.solders:moveForward(mhx,mhy)
+end
+
+function Game:moveForward()
+    
 end
 
 function Game:getMyHeadpos()
