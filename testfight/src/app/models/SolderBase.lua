@@ -9,6 +9,9 @@ SolderBase.SOLDER_TYPE_INFANTRY=3
 
 
 function SolderBase:ctor(myorene)
+    self.atktime=12/15
+    self.walktime=12/15
+    self.steadytime=7/12
     self.myorene=myorene
     --self.sprite=display.newSprite(self:getSolderName()):addTo(self)
     --self.sprite=display.newSprite():addTo(self)
@@ -20,6 +23,7 @@ function SolderBase:ctor(myorene)
     self.aninamesty=self:getAniStyName()
     self.aninameDead=self:getDeadName()
     self:addAnimationCache()
+
 end
 
 --function SolderBase:getSolderName()
@@ -55,40 +59,42 @@ end
 
 --µ¥±øÐÐ×ß
 function SolderBase:walk()
---    local function move(dt)
---        transition.moveBy(self,{time=0.2,x=20,y=15})
---    end
---    if self.sprite then
---        self:removeChild(self.sprite)
---    end
     self:stop()
-    self.aniaction=transition.playAnimationForever(self,display.getAnimationCache(self.aninamewalk))
-    self.aniaction:setTag(2)
-    --scheduler.scheduleGlobal(move,0.3)
+    self.aniactionwalk=transition.playAnimationForever(self,display.getAnimationCache(self.aninamewalk))
+    --self:playAnimationForever(display.getAnimationCache(self.aninamewalk))
+    self.aniactionwalk:setTag(1)
 end
 
 --µ¥±ø¹¥»÷
 function SolderBase:attack()
---    if self.sprite then 
---        self:removeChild(self.sprite)
---    end
     self:stop()
-    self.aniaction=transition.playAnimationForever(self,display.getAnimationCache(self.aninameatk))
-    self.aniaction:setTag(2)
+    --self.aniactionatk=transition.playAnimationForever(self,display.getAnimationCache(self.aninameatk))
+    self.aniactionatk=transition.playAnimationOnce(self,display.getAnimationCache(self.aninameatk))
+    self.aniactionatk:setTag(2)
+    --self:playAnimationOnce(display.getAnimationCache(self.aninameatk))
+    --return self.aniactionatk
 end
+
+
+
+--function SolderBase:getAttack()
+--    return display.getAnimationCache(self.aninameatk)
+--end
 
 --µ¥±ø´ýÃü
 function SolderBase:steady()
     self:stop()
-    self.aniaction=transition.playAnimationForever(self,display.getAnimationCache(self.aninamesty))
-    self.aniaction:setTag(2)
+    self.aniactionstd=transition.playAnimationForever(self,display.getAnimationCache(self.aninamesty))
+    self.aniactionstd:setTag(3)
+    --self:playAnimationForever(display.getAnimationCache(self.aninamesty))
 end
 
 --Í£Ö¹
 function SolderBase:stop()
-    --self.sprite:setVisible(true)
     self:stopActionByTag(2)
-    self.aniaction=nil
+        :stopActionByTag(1)
+        :stopActionByTag(3)
+    --transition.stopTarget()
 end
 
 --function SolderBase:die()
@@ -106,17 +112,17 @@ end
 function SolderBase:addAnimationCache()
     display.addSpriteFrames(self.aninamewalk..'.plist',self.aninamewalk..'.png')
     local frameswalk=display.newFrames(self.aninamewalk..'0%d.png',1,6)
-    local animationwalk=display.newAnimation(frameswalk,2/15)
+    local animationwalk=display.newAnimation(frameswalk,self.walktime/6)
     display.setAnimationCache(self.aninamewalk,animationwalk)--×ßÂ·¶¯»­
 
     display.addSpriteFrames(self.aninameatk..'.plist',self.aninameatk..'.png')
     local framesatk=display.newFrames(self.aninameatk..'0%d.png',1,6)
-    local animationatk=display.newAnimation(framesatk,2/15)
+    local animationatk=display.newAnimation(framesatk,self.atktime/6)
     display.setAnimationCache(self.aninameatk,animationatk)--¹¥»÷¶¯»­
 
     display.addSpriteFrames(self.aninamesty..'.plist',self.aninamesty..'.png')
     local framesty=display.newFrames(self.aninamesty..'0%d.png',1,7)
-    local animationsty=display.newAnimation(framesty,1/12)
+    local animationsty=display.newAnimation(framesty,self.steadytime/7)
     display.setAnimationCache(self.aninamesty,animationsty)--´ýÃü¶¯»­
 
 end
@@ -129,5 +135,7 @@ function SolderBase:runaway()
     --self:stop()
     self:walk()
 end
+
+
 
 return SolderBase

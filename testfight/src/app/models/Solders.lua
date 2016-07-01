@@ -16,7 +16,11 @@ function Solders:ctor(soldernum,myorene,typ)
     self.myorene=myorene        --我方敌方
     self.solders={}             --兵阵
     self.solderspos={}          --单兵初始位置
+    self.actionAtc=nil
     self.speed=nil
+    self.walktime=nil
+    self.atktime=nil
+    self.steadytime=nil
     --self.solderstype=Solders.SOLDERS_TYPE_HORSE --方阵兵种
     self:initSoldersPos()--初始化点位
     self:initSolders()--初始化兵阵
@@ -111,6 +115,21 @@ function Solders:initSolders()
         self.solderspos[i]=cc.p(x,y)
     end
     self.speed=self.solders[1]:getSpeed()
+    self.walktime=self.solders[1].walktime
+    self.atktime=self.solders[1].atktime
+    self.steadytime=self.solders[1].steadytime
+end
+
+function Solders:getWalktime()
+    return self.walktime
+end
+
+function Solders:getAtktime()
+    return self.atktime
+end
+
+function Solders:getSteadytime()
+    return self.steadytime
 end
 
 --每回合结束兵阵可以重新编队，向原点收缩
@@ -174,7 +193,7 @@ end
 --兵阵前进
 function Solders:moveForward(px,py)
     --if self.handle==nil then
-        self:reformat()
+        --self:reformat()
         for _,k in pairs(self.solderspos) do--修正原始点位
             k.x=k.x+px
             k.y=k.y+py
@@ -206,10 +225,24 @@ function Solders:stop()
     end
 end
 
+function Solders:steady()
+    for _,k in pairs(self.solders) do
+        k:steady()
+    end
+end
+
 function Solders:attack()
+--    local actions={}
     for _,k in pairs(self.solders)do
+--        actions[#actions+1]=k:attack()
         k:attack()
     end
+--    local action=cc.Spawn:create(actions)
+--    return action
+end
+
+function Solders:getAttack()
+    
 end
 
 --死兵，随机位置死

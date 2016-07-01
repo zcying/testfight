@@ -5,6 +5,7 @@ local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 local Solders=import(".Solders")
 local CardBase=import('.CardBase')
 local Battle=import('.Battle')
+local scheduler = require("framework.scheduler")  
 
 --兵阵初始点位
 local MYHEADPOS=cc.p(200,100)
@@ -56,8 +57,10 @@ function Game:ctor()
         :pos(display.cx,display.cy)
         :addTo(self)
     self.battle=Battle:new()
+    self.report=self.battle:getReport()
     self:initCardsPara()
     self:initSoldersAndCards()
+    self:getBattle()
     --testlable
     self.lable1=cc.ui.UILabel.new({--前进
         text='moveforward',
@@ -467,16 +470,83 @@ function Game:getReady()
         mmx,mmy=self:getDis(MYMIDPOS,MYCLOSERIGHTPOS)
         mhx,mhy=self:getDis(MYHEADPOS,MYCLOSELEFTPOS)
     end
-    if ef==2 and em==2 and eh==2 then
-        
+    if eh==2 and em==2 and ef==2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGRIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENELONGLEFTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENELONGMIDPOS)
+    elseif eh==2 and em~=2 and ef==2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGHALFRIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEMIDPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENELONGHALFLEFTPOS)
+    elseif eh==2 and em==2 and ef~=2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGHALFRIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENELONGHALFLEFTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEMIDPOS)
+    elseif eh==2 and em~=2 and ef~=2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGMIDPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEHALFRIGHTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEHALFLEFTPOS)
+    elseif eh~=2 and em==2 and ef==2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEMIDPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENELONGHALFRIGHTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENELONGHALFLEFTPOS)
+    elseif eh~=2 and em~=2 and ef==2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEHALFRIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEHALFLEFTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENELONGMIDPOS)
+    elseif eh~=2 and em==2 and ef~=2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEHALFRIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENELONGMIDPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEHALFLEFTPOS)
+    elseif eh~=2 and em~=2 and ef~=2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSERIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENECLOSERIGHTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEMIDPOS)
     end
     self.myfront.solders:moveForward(mfx,mfy)
     self.mymid.solders:moveForward(mmx,mmy)
     self.myhead.solders:moveForward(mhx,mhy)
+    self.enefront.solders:moveForward(efx,efy)
+    self.enemid.solders:moveForward(emx,emy)
+    self.enehead.solders:moveForward(ehx,ehy)
 end
 
+--有兵阵死光自动补位
 function Game:moveForward()
     
+end
+
+--解析战报
+function Game:getBattle()
+--    local actions={}
+--    local aciton=nil
+    for i=1,8 do 
+        local round=self.report['round'..i]
+        if round~=nil then 
+            for j=1,6 do
+                local attack=round['attack'..j]
+                if attack~=nil then
+                    self[attack.atkfrom].solders:attack()
+                    self[attack.atkfrom].card:attack()
+                    for k=1,8 do
+                        if  attack['atktype'..k]~=nil then
+                            for k,v in pairs(attack['atkto'..k])do
+                                self[k].card:setHp(v,1)
+                            end
+                        end
+                    end
+--                    local sequence = transition.sequence({
+----                  cc.DelayTime:create(self[attack.atkfrom].solders:getAtktime()),
+--                    cc.DelayTime:create(1),
+--                    self[attack.atkfrom].solders:steady(),
+--                    self[attack.atkfrom].card:back(),
+--                    printLog(self[attack.atkfrom].solders:getAtktime()),
+--                    breaknum=1})
+--                    self:runAction(sequence)
+                end
+            end 
+        end
+    end
 end
 
 function Game:getMyHeadpos()
