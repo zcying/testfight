@@ -237,6 +237,7 @@
     <Content Include="testfight\res\background.jpg" />
     <Content Include="testfight\res\enearcheratk.plist" />
     <Content Include="testfight\res\enearcheratk.png" />
+    <Content Include="testfight\res\enearcherdie.png" />
     <Content Include="testfight\res\enearchersteady.plist" />
     <Content Include="testfight\res\enearchersteady.png" />
     <Content Include="testfight\res\enearcherwalk.plist" />
@@ -252,12 +253,14 @@
     <Content Include="testfight\res\enehorsewalk.png" />
     <Content Include="testfight\res\eneinfatk.plist" />
     <Content Include="testfight\res\eneinfatk.png" />
+    <Content Include="testfight\res\eneinfdie.png" />
     <Content Include="testfight\res\eneinfsteady.plist" />
     <Content Include="testfight\res\eneinfsteady.png" />
     <Content Include="testfight\res\eneinfwalk.plist" />
     <Content Include="testfight\res\eneinfwalk.png" />
     <Content Include="testfight\res\myarcheratk.plist" />
     <Content Include="testfight\res\myarcheratk.png" />
+    <Content Include="testfight\res\myarcherdie.png" />
     <Content Include="testfight\res\myarchersteady.plist" />
     <Content Include="testfight\res\myarchersteady.png" />
     <Content Include="testfight\res\myarcherwalk.plist" />
@@ -273,6 +276,7 @@
     <Content Include="testfight\res\myhorsewalk.png" />
     <Content Include="testfight\res\myinfatk.plist" />
     <Content Include="testfight\res\myinfatk.png" />
+    <Content Include="testfight\res\myinfdie.png" />
     <Content Include="testfight\res\myinfsteady.plist" />
     <Content Include="testfight\res\myinfsteady.png" />
     <Content Include="testfight\res\myinfwalk.plist" />

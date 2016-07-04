@@ -5,7 +5,7 @@ local SolderHorse = class("SolderHorse",SolderBase)
 
 function SolderHorse:ctor(myorene)
     SolderHorse.super.ctor(self,myorene)
-    self.speed=200
+    self.speed=300
     self.soldertype=SolderBase.SOLDER_TYPE_HORSE
 end
 

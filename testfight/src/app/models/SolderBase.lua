@@ -10,7 +10,7 @@ SolderBase.SOLDER_TYPE_INFANTRY=3
 
 function SolderBase:ctor(myorene)
     self.atktime=12/15
-    self.walktime=12/15
+    self.walktime=4/15
     self.steadytime=7/12
     self.myorene=myorene
     --self.sprite=display.newSprite(self:getSolderName()):addTo(self)
@@ -69,17 +69,24 @@ end
 function SolderBase:attack()
     self:stop()
     --self.aniactionatk=transition.playAnimationForever(self,display.getAnimationCache(self.aninameatk))
-    self.aniactionatk=transition.playAnimationOnce(self,display.getAnimationCache(self.aninameatk))
+    self.aniactionatk=transition.playAnimationOnce(self,
+                                                   display.getAnimationCache(self.aninameatk),
+                                                   false,
+                                                   function() 
+                                                      self:steady() 
+                                                   end)
     self.aniactionatk:setTag(2)
     --self:playAnimationOnce(display.getAnimationCache(self.aninameatk))
-    --return self.aniactionatk
+    return self.aniactionatk
 end
 
+function SolderBase:getAttack()
+    return display.getAnimationCache(self.aninameatk)
+end
 
-
---function SolderBase:getAttack()
---    return display.getAnimationCache(self.aninameatk)
---end
+function SolderBase:getSteady()
+    return display.getAnimationCache(self.aninamesty)
+end
 
 --单兵待命
 function SolderBase:steady()
@@ -112,18 +119,18 @@ end
 function SolderBase:addAnimationCache()
     display.addSpriteFrames(self.aninamewalk..'.plist',self.aninamewalk..'.png')
     local frameswalk=display.newFrames(self.aninamewalk..'0%d.png',1,6)
-    local animationwalk=display.newAnimation(frameswalk,self.walktime/6)
-    display.setAnimationCache(self.aninamewalk,animationwalk)--走路动画
+    self.animationwalk=display.newAnimation(frameswalk,self.walktime/6)
+    display.setAnimationCache(self.aninamewalk,self.animationwalk)--走路动画
 
     display.addSpriteFrames(self.aninameatk..'.plist',self.aninameatk..'.png')
     local framesatk=display.newFrames(self.aninameatk..'0%d.png',1,6)
-    local animationatk=display.newAnimation(framesatk,self.atktime/6)
-    display.setAnimationCache(self.aninameatk,animationatk)--攻击动画
+    self.animationatk=display.newAnimation(framesatk,self.atktime/6)
+    display.setAnimationCache(self.aninameatk,self.animationatk)--攻击动画
 
     display.addSpriteFrames(self.aninamesty..'.plist',self.aninamesty..'.png')
     local framesty=display.newFrames(self.aninamesty..'0%d.png',1,7)
-    local animationsty=display.newAnimation(framesty,self.steadytime/7)
-    display.setAnimationCache(self.aninamesty,animationsty)--待命动画
+    self.animationsty=display.newAnimation(framesty,self.steadytime/7)
+    display.setAnimationCache(self.aninamesty,self.animationsty)--待命动画
 
 end
 

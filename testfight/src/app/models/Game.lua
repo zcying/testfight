@@ -60,7 +60,20 @@ function Game:ctor()
     self.report=self.battle:getReport()
     self:initCardsPara()
     self:initSoldersAndCards()
-    self:getBattle()
+    --self:toRect()
+    scheduler.performWithDelayGlobal(
+        function()
+            self:toRect()
+        end,0.2)
+    scheduler.performWithDelayGlobal(
+        function()
+            self:getReady()
+            scheduler.performWithDelayGlobal(
+                function()
+                    self:getBattle() 
+                end,2.1) 
+        end,1.1)
+    --self:getBattle()
     --testlable
     self.lable1=cc.ui.UILabel.new({--前进
         text='moveforward',
@@ -269,7 +282,7 @@ function Game:ctor()
                                   end)
 
        self.lable10=cc.ui.UILabel.new({--变成楔形
-        text='herosneverdie',
+        text='solderneverdie',
         x=display.width-300,
         y=display.height-450,
         size=32})
@@ -278,12 +291,12 @@ function Game:ctor()
         :addNodeEventListener(cc.NODE_TOUCH_EVENT,
                               function(event)
                                 if event.name=='ended' then
-                                    self.myhead.solders:herosNeverDie(math.random(1,3))
-                                    self.mymid.solders:herosNeverDie(math.random(1,3))
-                                    self.myfront.solders:herosNeverDie(math.random(1,3))
-                                    self.enehead.solders:herosNeverDie(math.random(1,3))
-                                    self.enemid.solders:herosNeverDie(math.random(1,3))
-                                    self.enefront.solders:herosNeverDie(math.random(1,3))
+                                    self.myhead.solders:solderNeverDie(math.random(1,3))
+                                    self.mymid.solders:solderNeverDie(math.random(1,3))
+                                    self.myfront.solders:solderNeverDie(math.random(1,3))
+                                    self.enehead.solders:solderNeverDie(math.random(1,3))
+                                    self.enemid.solders:solderNeverDie(math.random(1,3))
+                                    self.enefront.solders:solderNeverDie(math.random(1,3))
                                 end
                                 return true
                               end)
@@ -298,6 +311,7 @@ function Game:ctor()
         :onButtonRelease(function(event)
             self.myhead.card:back()
             self.enefront.card:back()
+            
         end)
         :addTo(self)
 
@@ -315,6 +329,7 @@ function Game:ctor()
                                 end
                                 return true
                               end)
+
 --   self.lable4=cc.ui.UILabel.new({
 --        text='runaway2',
 --        x=display.width-300,
@@ -428,6 +443,15 @@ function Game:getDis(posfrom,posto)
     return posto.x-posfrom.x, posto.y-posfrom.y
 end
 
+function Game:toRect()
+    self.myhead.solders:toRect()
+    self.mymid.solders:toRect()
+    self.myfront.solders:toRect()
+    self.enehead.solders:toRect()
+    self.enemid.solders:toRect()
+    self.enefront.solders:toRect()    
+end
+
 --到初始站位
 function Game:getReady()
     local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy
@@ -517,34 +541,38 @@ function Game:moveForward()
 end
 
 --解析战报
-function Game:getBattle()
---    local actions={}
---    local aciton=nil
-    for i=1,8 do 
+function Game:getBattle()   
+    for i=1,8 do --8回合
         local round=self.report['round'..i]
         if round~=nil then 
-            for j=1,6 do
+            for j=1,6 do --每回合两边各三张牌攻击，共6轮攻击
                 local attack=round['attack'..j]
                 if attack~=nil then
-                    self[attack.atkfrom].solders:attack()
-                    self[attack.atkfrom].card:attack()
-                    for k=1,8 do
-                        if  attack['atktype'..k]~=nil then
-                            for k,v in pairs(attack['atkto'..k])do
+                    self[attack.atkfrom].card:attack()--攻击卡牌显示
+                    for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
+                        self[attack.atkfrom].solders:attack()--一次兵阵攻击
+                        if  attack['atktype'..l]~=nil then
+                            for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
+                                local beforhp=self[k].card:getHp()
                                 self[k].card:setHp(v,1)
+                                local afterhp=self[k].card:getHp()
+                                scheduler.performWithDelayGlobal(
+                                    function()
+                                        if v<0 then
+                                            self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--被攻击死
+                                        else
+                                            self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
+                                        end
+                                        self[attack.atkfrom].solders:steady()--攻击完待命
+                                        self[attack.atkfrom].card:back()--卡牌回位
+                                    end,
+                                    self[attack.atkfrom].solders:getAtktime()--攻击时间
+                                )
                             end
                         end
-                    end
---                    local sequence = transition.sequence({
-----                  cc.DelayTime:create(self[attack.atkfrom].solders:getAtktime()),
---                    cc.DelayTime:create(1),
---                    self[attack.atkfrom].solders:steady(),
---                    self[attack.atkfrom].card:back(),
---                    printLog(self[attack.atkfrom].solders:getAtktime()),
---                    breaknum=1})
---                    self:runAction(sequence)
+                    end         
                 end
-            end 
+            end
         end
     end
 end

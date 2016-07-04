@@ -99,19 +99,19 @@ function Solders:initSolders()
 --        local y=30*(1-2*(i%2))*(math.ceil((i+4)/4)-1)
 
         --按楔形排
---        local x=self.wedgepos[i][1]
---        local y=self.wedgepos[i][2]
+        local x=self.wedgepos[i][1]
+        local y=self.wedgepos[i][2]
         --按方形排
-        local x=self.rectpos[i][1]
-        local y=self.rectpos[i][2]
+--        local x=self.rectpos[i][1]
+--        local y=self.rectpos[i][2]
         self.solders[i]:align(display.CENTER)
                        :pos(x,y)
                        :addTo(self)
                        :steady()
 --        local x=self.wedgepos[i][1]
 --        local y=self.wedgepos[i][2]
---        local x=self.rectpos[i][1]
---        local y=self.rectpos[i][2]
+        local x=self.rectpos[i][1]
+        local y=self.rectpos[i][2]
         self.solderspos[i]=cc.p(x,y)
     end
     self.speed=self.solders[1]:getSpeed()
@@ -147,9 +147,9 @@ function Solders:reformat()
         transition.moveTo(self.solders[i],{time=distance/self.speed,
                              x=newposx,
                              y=newposy,
---                             onComplete=function()
---                                 self.solders[i]:stop()
---                             end
+                             onComplete=function()
+                                 self.solders[i]:steady()
+                             end
                             })
     end
 end
@@ -165,9 +165,9 @@ function Solders:toRect()
         transition.moveTo(self.solders[i],{time=distance/self.speed,
                              x=newposx,
                              y=newposy,
---                             onComplete=function()
---                                 self.solders[i]:stop()
---                             end
+                             onComplete=function()
+                                 self.solders[i]:steady()
+                             end
                             })   
     end
 end
@@ -183,9 +183,9 @@ function Solders:toWedge()
         transition.moveTo(self.solders[i],{time=distance/self.speed,
                              x=newposx,
                              y=newposy,
---                             onComplete=function()
---                                 self.solders[i]:stop()
---                             end
+                             onComplete=function()
+                                 self.solders[i]:steady()
+                             end
                             })   
     end
 end
@@ -214,7 +214,6 @@ function Solders:moveForward(px,py)
                                              })
                 :setTag(1)
         end
-    --end
 end
 
 --停止所有动作
@@ -232,17 +231,18 @@ function Solders:steady()
 end
 
 function Solders:attack()
---    local actions={}
     for _,k in pairs(self.solders)do
---        actions[#actions+1]=k:attack()
         k:attack()
     end
---    local action=cc.Spawn:create(actions)
---    return action
 end
 
 function Solders:getAttack()
-    
+    local actions={}
+    for _,k in pairs(self.solders)do
+        actions[#actions + 1] =transition.sequence({cc.Animate:create(k:getAttack()),cc.Animate:create(k:getSteady())})
+        transition.stopTarget(k)
+        k:runAction(actions[#actions])
+    end
 end
 
 --死兵，随机位置死
@@ -351,7 +351,7 @@ function Solders:runaway(num)
 end
 
 --英雄不朽
-function Solders:herosNeverDie(num)
+function Solders:solderNeverDie(num)
     self:getSoldernum()
     for i=self.soldernum+1,self.soldernum+num do
         if self.typ==Solders.SOLDERS_TYPE_HORSE then
@@ -366,7 +366,7 @@ function Solders:herosNeverDie(num)
         self.solders[i]:align(display.CENTER)
                        :pos(x,y)
                        :addTo(self)
-                       :walk()
+                       :steady()
 --        local x=self.wedgepos[i][1]
 --        local y=self.wedgepos[i][2]
 --        local x=self.rectpos[i][1]

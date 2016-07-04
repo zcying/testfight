@@ -4,7 +4,7 @@ local SolderArcher = class("SolderArcher",SolderBase)
 
 function SolderArcher:ctor(myorene)
     SolderArcher.super.ctor(self,myorene)
-    self.speed=150
+    self.speed=200
     self.soldertype=SolderBase.SOLDER_TYPE_ARCHER
 end
 
