@@ -258,8 +258,11 @@ function Solders:die(deadnum)
     for i=deadnum,1,-1 do
         local deadsolder=self.solders[deadkeys[i]]
         local sprite=display.newSprite(deadsolder:getDeadName())
-                     :pos(deadsolder:getPosition())
-                     :addTo(self)
+        if self.typ==Solders.SOLDERS_TYPE_HORSE then
+            sprite:scale(0.5)
+        end
+        sprite:pos(deadsolder:getPosition())
+              :addTo(self)
         self:removeChild(self.solders[deadkeys[i]])
         transition.fadeOut(sprite,{time=0.5,
                                    delay=0.5,

@@ -18,7 +18,7 @@ function Battle:ctor()
             attack2={atkfrom='myhead',atktype1='jianlan',atkto1={enefront=-193,enemid=-891},
                                       atktype2='normal',atkto2={enemid=-439}},
             attack3={atkfrom='myfront',atktype1='normal',atkto1={enehead=-476}},
-            attack4={atkfrom='enehead',atktype1='normal',atkto1={myhead=-212}},
+            attack4={atkfrom='enehead',atktype1='normal',atkto1={myhead=-1588}},
             attack5=nil,
             attack6=nil
                 },
@@ -37,7 +37,7 @@ function Battle:initCard()
     self.battlecard={myhead={typ=Battle.SOLDER_TYPE_HORSE,hp=2800,cardname='mycard1.png',atk,def,pos,speed},
                      mymid={typ=Battle.SOLDER_TYPE_INFANTRY,hp=1700,cardname='mycard2.png',atk,def,pos,speed},
                      myfront={typ=Battle.SOLDER_TYPE_ARCHER,hp=1200,cardname='mycard3.png',atk,def,pos,speed},
-                     enehead={typ=Battle.SOLDER_TYPE_ARCHER,hp=1900,cardname='enecard1.png',atk,def,pos,speed},
+                     enehead={typ=Battle.SOLDER_TYPE_INFANTRY,hp=1900,cardname='enecard1.png',atk,def,pos,speed},
                      enemid={typ=Battle.SOLDER_TYPE_ARCHER,hp=888,cardname='enecard2.png',atk,def,pos,speed},
                      enefront={typ=Battle.SOLDER_TYPE_HORSE,hp=1000,cardname='enecard3.png',atk,def,pos,speed}}    
 end

@@ -540,18 +540,62 @@ function Game:moveForward()
     
 end
 
---解析战报
-function Game:getBattle()   
+----解析战斗过程
+--function Game:getBattle() 
+--    for i=1,8 do --8回合
+--        local round=self.report['round'..i]
+--        if round~=nil then 
+--            for j=1,6 do --每回合两边各三张牌攻击，共6轮攻击
+--                local attack=round['attack'..j]
+--                if attack~=nil then
+--                    self[attack.atkfrom].card:attack()--攻击卡牌显示
+--                    for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
+--                        self[attack.atkfrom].solders:attack()--一次兵阵攻击
+--                        if  attack['atktype'..l]~=nil then
+
+--                            for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
+--                                local beforhp=self[k].card:getHp()
+--                                self[k].card:setHp(v,1)
+--                                local afterhp=self[k].card:getHp()
+--                                scheduler.performWithDelayGlobal(
+--                                    function()
+--                                        if v<0 then
+--                                            self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--被攻击死
+--                                        else
+--                                            self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
+--                                        end
+--                                        self[attack.atkfrom].solders:steady()--攻击完待命
+--                                        self[attack.atkfrom].card:back()--卡牌回位
+--                                    end,
+--                                    self[attack.atkfrom].solders:getAtktime()--攻击时间
+--                                )
+--                            end
+
+--                        end
+--                    end       
+--                end
+--            end
+--        end
+--    end
+
+--end
+
+--解析战斗过程
+function Game:getBattle()
+    local action={} 
     for i=1,8 do --8回合
         local round=self.report['round'..i]
         if round~=nil then 
             for j=1,6 do --每回合两边各三张牌攻击，共6轮攻击
                 local attack=round['attack'..j]
                 if attack~=nil then
-                    self[attack.atkfrom].card:attack()--攻击卡牌显示
-                    for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
-                        self[attack.atkfrom].solders:attack()--一次兵阵攻击
+                    for l=1,2 do    --极限情况一个人可以攻击8次，一般两次
+                        action[#action+1]=transition.sequence({
+                        cc.DelayTime:create(2),
+                        cc.CallFunc:create(function()
                         if  attack['atktype'..l]~=nil then
+                            self[attack.atkfrom].card:attack()--攻击卡牌显示
+                            self[attack.atkfrom].solders:attack()--一次兵阵攻击
                             for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
                                 local beforhp=self[k].card:getHp()
                                 self[k].card:setHp(v,1)
@@ -564,17 +608,19 @@ function Game:getBattle()
                                             self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
                                         end
                                         self[attack.atkfrom].solders:steady()--攻击完待命
-                                        self[attack.atkfrom].card:back()--卡牌回位
+                                        self[attack.atkfrom].card:back()--卡牌回位 
                                     end,
                                     self[attack.atkfrom].solders:getAtktime()--攻击时间
-                                )
+                               )    
                             end
                         end
-                    end         
+                        end)})
+                    end       
                 end
             end
         end
     end
+    self:runAction(transition.sequence(action)) 
 end
 
 function Game:getMyHeadpos()
