@@ -71,8 +71,8 @@ function Game:ctor()
             scheduler.performWithDelayGlobal(
                 function()
                     self:getBattle() 
-                end,2.1) 
-        end,1.1)
+                end,1.5) 
+        end,1)
     --self:getBattle()
     --testlable
     self.lable1=cc.ui.UILabel.new({--前进
@@ -454,13 +454,14 @@ end
 
 --到初始站位
 function Game:getReady()
-    local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy
-    local mf=self.myfront.card:getType()
+    local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy--6个初始移动距离
+    local mf=self.myfront.card:getType()--获取六个卡的兵种类型
     local mm=self.mymid.card:getType()
     local mh=self.myhead.card:getType()
     local ef=self.enefront.card:getType()
     local em=self.enemid.card:getType()
     local eh=self.enehead.card:getType()
+--近战/远程两种兵，大营/中军/前锋三个初始位置，敌/我，2^3*2，16种初始站位
     if mf==2 and mm==2 and mh==2 then
         mfx,mfy=self:getDis(MYFRONTPOS,MYLONGMIDPOS)
         mmx,mmy=self:getDis(MYMIDPOS,MYLONGRIGHTPOS)
@@ -583,19 +584,27 @@ end
 --解析战斗过程
 function Game:getBattle()
     local action={} 
+    local roundlabel=cc.ui.UILabel.new({
+        text='round0',
+        size=40,
+        x=display.cx,
+        y=display.height-50
+    }):addTo(self)
     for i=1,8 do --8回合
         local round=self.report['round'..i]
         if round~=nil then 
             for j=1,6 do --每回合两边各三张牌攻击，共6轮攻击
                 local attack=round['attack'..j]
-                if attack~=nil then
-                    for l=1,2 do    --极限情况一个人可以攻击8次，一般两次
+                if attack==nil then break end
+                    for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
+                        if  attack['atktype'..l]==nil then break end
                         action[#action+1]=transition.sequence({
-                        cc.DelayTime:create(2),
+                        cc.DelayTime:create(1.5),
                         cc.CallFunc:create(function()
-                        if  attack['atktype'..l]~=nil then
+                            roundlabel:setString('round'..i)
                             self[attack.atkfrom].card:attack()--攻击卡牌显示
                             self[attack.atkfrom].solders:attack()--一次兵阵攻击
+                            --local atklabel=cc.ui.UILabel.new({text=attack['atktype'..l],size=36}):pos(self[attack.atkfrom].card:getPosition()):addTo(self)
                             for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
                                 local beforhp=self[k].card:getHp()
                                 self[k].card:setHp(v,1)
@@ -608,15 +617,16 @@ function Game:getBattle()
                                             self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
                                         end
                                         self[attack.atkfrom].solders:steady()--攻击完待命
-                                        self[attack.atkfrom].card:back()--卡牌回位 
+                                        self[attack.atkfrom].card:back()--卡牌回位
+                                        self[k].solders:toRect() 
+                                        --self:removeChild(atklabel)
                                     end,
                                     self[attack.atkfrom].solders:getAtktime()--攻击时间
                                )    
                             end
                         end
-                        end)})
+                        )})
                     end       
-                end
             end
         end
     end

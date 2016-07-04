@@ -2,6 +2,7 @@
 local Solders = class("Solders",function()
 		return display.newLayer()
        	end)
+
 Solders.SOLDERS_TYPE_HORSE=1
 Solders.SOLDERS_TYPE_ARCHER=2
 Solders.SOLDERS_TYPE_INFANTRY=3
@@ -394,6 +395,10 @@ function Solders:getDeadkey(dienum)
     end
     table.sort(deadkeys)
     return deadkeys
+end
+
+function Solders:getLeadPos()
+    return self.solders[1]:getPosition()
 end
 
 return Solders

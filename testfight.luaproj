@@ -271,7 +271,7 @@
     <Content Include="testfight\res\mycard3.png" />
     <Content Include="testfight\res\myhorseatk.plist" />
     <Content Include="testfight\res\myhorseatk.png" />
-    <Content Include="testfight\res\myhorsedie .png" />
+    <Content Include="testfight\res\myhorsedie.png" />
     <Content Include="testfight\res\myhorsesteady.plist" />
     <Content Include="testfight\res\myhorsesteady.png" />
     <Content Include="testfight\res\myhorsewalk.plist" />
