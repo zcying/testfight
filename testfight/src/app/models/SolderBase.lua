@@ -75,9 +75,17 @@ function SolderBase:attack()
                                                    function() 
                                                       self:steady() 
                                                    end)
-    self.aniactionatk:setTag(2)
+                                                   :setTag(2)
     --self:playAnimationOnce(display.getAnimationCache(self.aninameatk))
     return self.aniactionatk
+end
+
+function SolderBase:attackForever()
+    self:stop()
+    self.aniactionatkf=transition.playAnimationForever(self,
+                                                       display.getAnimationCache(self.aninameatk),
+                                                       false)
+                                                       :setTag(4)
 end
 
 function SolderBase:getAttack()
@@ -98,9 +106,10 @@ end
 
 --ֹͣ
 function SolderBase:stop()
-    self:stopActionByTag(2)
-        :stopActionByTag(1)
-        :stopActionByTag(3)
+    self:stopActionByTag(2)--attack
+        :stopActionByTag(1)--walk
+        :stopActionByTag(3)--steady
+        :stopActionByTag(4)--atkforever
     --transition.stopTarget()
 end
 

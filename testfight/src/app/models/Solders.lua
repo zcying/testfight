@@ -121,14 +121,17 @@ function Solders:initSolders()
     self.steadytime=self.solders[1].steadytime
 end
 
+--返回一次走路时间
 function Solders:getWalktime()
     return self.walktime
 end
 
+--返回一次攻击时间
 function Solders:getAtktime()
     return self.atktime
 end
 
+--返回一次待命动画时间
 function Solders:getSteadytime()
     return self.steadytime
 end
@@ -155,6 +158,7 @@ function Solders:reformat()
     end
 end
 
+--变方形并待命
 function Solders:toRect()
     self:getSoldernum()
     for i=1,self.soldernum do
@@ -173,6 +177,26 @@ function Solders:toRect()
     end
 end
 
+--变方形并永远攻击
+function Solders:toRectandAtk()
+    self:getSoldernum()
+    for i=1,self.soldernum do
+        local oldposx,oldposy=self.solders[i]:getPosition()
+        local newposx=self.rectpos[i][1]
+        local newposy=self.rectpos[i][2]
+        local distance=math.sqrt((oldposx-newposx)*(oldposx-newposx)+(oldposy-newposy)*(oldposy-newposy))
+        self.solders[i]:walk()
+        transition.moveTo(self.solders[i],{time=distance/self.speed,
+                             x=newposx,
+                             y=newposy,
+                             onComplete=function()
+                                 self.solders[i]:attackForever()
+                             end
+                            })   
+    end
+end
+
+--变楔形
 function Solders:toWedge()
     self:getSoldernum()
     for i=1,self.soldernum do
@@ -210,7 +234,7 @@ function Solders:moveForward(px,py)
             k.moveAciton=transition.moveBy(k,{time=math.sqrt(px*px+py*py)/self.speed,
                                               x=px,y=py,
                                               onComplete=function()
-                                                 k:steady()
+                                                 k:attackForever()
                                               end
                                              })
                 :setTag(1)
@@ -225,26 +249,35 @@ function Solders:stop()
     end
 end
 
+--待命
 function Solders:steady()
     for _,k in pairs(self.solders) do
         k:steady()
     end
 end
 
+--一次攻击
 function Solders:attack()
     for _,k in pairs(self.solders)do
         k:attack()
     end
 end
 
-function Solders:getAttack()
-    local actions={}
+--永远攻击动作
+function Solders:attackForever()
     for _,k in pairs(self.solders)do
-        actions[#actions + 1] =transition.sequence({cc.Animate:create(k:getAttack()),cc.Animate:create(k:getSteady())})
-        transition.stopTarget(k)
-        k:runAction(actions[#actions])
+        k:attackForever()
     end
 end
+
+--function Solders:getAttack()
+--    local actions={}
+--    for _,k in pairs(self.solders)do
+--        actions[#actions + 1] =transition.sequence({cc.Animate:create(k:getAttack()),cc.Animate:create(k:getSteady())})
+--        transition.stopTarget(k)
+--        k:runAction(actions[#actions])
+--    end
+--end
 
 --死兵，随机位置死
 function Solders:die(deadnum)

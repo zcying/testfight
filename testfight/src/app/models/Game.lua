@@ -53,6 +53,7 @@ local ENEFRONTCARDPOS=cc.p(display.width-230,50)
 
 function Game:ctor()
     math.randomseed(os.time())
+    self.cardkey={'myhead','mymid','myfront','enehead','enemid','enefront'}
     self.background=display.newSprite('background.jpg')
         :pos(display.cx,display.cy)
         :addTo(self)
@@ -381,12 +382,21 @@ function Game:onEnter()
 end
 
 function Game:initCardsPara()--从battle获取card的初始参数
-    self.myhead={cardpara=self.battle:getCardbyKey('myhead'),card,solders,myorene='my'}--我军大本营
-    self.mymid={cardpara=self.battle:getCardbyKey('mymid'),card,solders,myorene='my'}  --中军
-    self.myfront={cardpara=self.battle:getCardbyKey('myfront'),card,solders,myorene='my'}--前锋
-    self.enehead={cardpara=self.battle:getCardbyKey('enehead'),card,solders,myorene='ene'}--敌军
-    self.enemid={cardpara=self.battle:getCardbyKey('enemid'),card,solders,myorene='ene'}  
-    self.enefront={cardpara=self.battle:getCardbyKey('enefront'),card,solders,myorene='ene'}
+    for k,v in pairs(self.cardkey)do
+        local myorene=string.sub(v,1,1)
+        if myorene=='m' then 
+            myorene='my'
+        else 
+            myorene='ene'
+        end
+        self[v]={cardpara=self.battle:getCardbyKey(v),card,solders,myorene=myorene}
+    end
+--    self.myhead={cardpara=self.battle:getCardbyKey('myhead'),card,solders,myorene='my'}--我军大本营
+--    self.mymid={cardpara=self.battle:getCardbyKey('mymid'),card,solders,myorene='my'}  --中军
+--    self.myfront={cardpara=self.battle:getCardbyKey('myfront'),card,solders,myorene='my'}--前锋
+--    self.enehead={cardpara=self.battle:getCardbyKey('enehead'),card,solders,myorene='ene'}--敌军
+--    self.enemid={cardpara=self.battle:getCardbyKey('enemid'),card,solders,myorene='ene'}  
+--    self.enefront={cardpara=self.battle:getCardbyKey('enefront'),card,solders,myorene='ene'}
 end
 
 function Game:initSoldersAndCards()--初始化card和solders
@@ -403,6 +413,7 @@ end
 --卡牌类型：兵种：速度、攻击距离等
 --soc:solders on card,a table including cardparameter,solders and card
 function Game:addSoldersOnCard(soc,solderpos,cardpos)
+    if soc.cardpara==nil then return end
     local myorene=soc.myorene
     local hp=soc.cardpara.hp
     local cardname=soc.cardpara.cardname
@@ -444,17 +455,16 @@ function Game:getDis(posfrom,posto)
 end
 
 function Game:toRect()
-    self.myhead.solders:toRect()
-    self.mymid.solders:toRect()
-    self.myfront.solders:toRect()
-    self.enehead.solders:toRect()
-    self.enemid.solders:toRect()
-    self.enefront.solders:toRect()    
+    for k,v in pairs(self.cardkey)do
+        if self[v].solders then
+            self[v].solders:toRect()
+        end
+    end   
 end
 
 --到初始站位
 function Game:getReady()
-    local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy--6个初始移动距离
+    local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy,mf,mm,mh,ef,em,eh--6个初始移动距离
     local mf=self.myfront.card:getType()--获取六个卡的兵种类型
     local mm=self.mymid.card:getType()
     local mh=self.myhead.card:getType()
@@ -525,7 +535,7 @@ function Game:getReady()
         efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEHALFLEFTPOS)
     elseif eh~=2 and em~=2 and ef~=2 then
         ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSERIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENECLOSERIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENECLOSELEFTPOS)
         efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEMIDPOS)
     end
     self.myfront.solders:moveForward(mfx,mfy)
@@ -540,46 +550,6 @@ end
 function Game:moveForward()
     
 end
-
-----解析战斗过程
---function Game:getBattle() 
---    for i=1,8 do --8回合
---        local round=self.report['round'..i]
---        if round~=nil then 
---            for j=1,6 do --每回合两边各三张牌攻击，共6轮攻击
---                local attack=round['attack'..j]
---                if attack~=nil then
---                    self[attack.atkfrom].card:attack()--攻击卡牌显示
---                    for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
---                        self[attack.atkfrom].solders:attack()--一次兵阵攻击
---                        if  attack['atktype'..l]~=nil then
-
---                            for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
---                                local beforhp=self[k].card:getHp()
---                                self[k].card:setHp(v,1)
---                                local afterhp=self[k].card:getHp()
---                                scheduler.performWithDelayGlobal(
---                                    function()
---                                        if v<0 then
---                                            self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--被攻击死
---                                        else
---                                            self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
---                                        end
---                                        self[attack.atkfrom].solders:steady()--攻击完待命
---                                        self[attack.atkfrom].card:back()--卡牌回位
---                                    end,
---                                    self[attack.atkfrom].solders:getAtktime()--攻击时间
---                                )
---                            end
-
---                        end
---                    end       
---                end
---            end
---        end
---    end
-
---end
 
 --解析战斗过程
 function Game:getBattle()
@@ -603,7 +573,7 @@ function Game:getBattle()
                         cc.CallFunc:create(function()
                             roundlabel:setString('round'..i)
                             self[attack.atkfrom].card:attack()--攻击卡牌显示
-                            self[attack.atkfrom].solders:attack()--一次兵阵攻击
+                            self[attack.atkfrom].solders:attackForever()--一次兵阵攻击
                             --local atklabel=cc.ui.UILabel.new({text=attack['atktype'..l],size=36}):pos(self[attack.atkfrom].card:getPosition()):addTo(self)
                             for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
                                 local beforhp=self[k].card:getHp()
@@ -616,9 +586,9 @@ function Game:getBattle()
                                         else
                                             self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
                                         end
-                                        self[attack.atkfrom].solders:steady()--攻击完待命
+                                        --self[attack.atkfrom].solders:steady()--攻击完待命
                                         self[attack.atkfrom].card:back()--卡牌回位
-                                        self[k].solders:toRect() 
+                                        self[k].solders:toRectandAtk ()
                                         --self:removeChild(atklabel)
                                     end,
                                     self[attack.atkfrom].solders:getAtktime()--攻击时间

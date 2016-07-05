@@ -51,11 +51,11 @@ end
 
 --初始化卡牌，my/ene_head/mid/front,我/敌_大营/中军/前锋，typ兵阵类型，hp，cardname卡图片文件名
 function Battle:initCard()
-    self.battlecard={myhead={typ=Battle.SOLDER_TYPE_HORSE,hp=2700,cardname='mycard1.png',atk,def,pos,speed},
+    self.battlecard={myhead={typ=Battle.SOLDER_TYPE_INFANTRY,hp=2700,cardname='mycard1.png',atk,def,pos,speed},
                      mymid={typ=Battle.SOLDER_TYPE_INFANTRY,hp=2100,cardname='mycard2.png',atk,def,pos,speed},
                      myfront={typ=Battle.SOLDER_TYPE_ARCHER,hp=1400,cardname='mycard3.png',atk,def,pos,speed},
-                     enehead={typ=Battle.SOLDER_TYPE_INFANTRY,hp=1900,cardname='enecard1.png',atk,def,pos,speed},
-                     enemid={typ=Battle.SOLDER_TYPE_ARCHER,hp=2888,cardname='enecard2.png',atk,def,pos,speed},
+                     enehead={typ=Battle.SOLDER_TYPE_HORSE,hp=1900,cardname='enecard1.png',atk,def,pos,speed},
+                     enemid={typ=Battle.SOLDER_TYPE_INFANTRY,hp=2888,cardname='enecard2.png',atk,def,pos,speed},
                      enefront={typ=Battle.SOLDER_TYPE_HORSE,hp=1500,cardname='enecard3.png',atk,def,pos,speed}}    
 end
 
