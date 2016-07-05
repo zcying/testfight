@@ -66,7 +66,7 @@ function SolderBase:walk()
 end
 
 --单兵攻击
-function SolderBase:attack()
+function SolderBase:attack(posfrom,posto)
     self:stop()
     --self.aniactionatk=transition.playAnimationForever(self,display.getAnimationCache(self.aninameatk))
     self.aniactionatk=transition.playAnimationOnce(self,
@@ -145,10 +145,6 @@ end
 
 --逃跑，实际就是walk
 function SolderBase:runaway()
-    if self.sprite then 
-        self:removeChild(self.sprite)
-    end
-    --self:stop()
     self:walk()
 end
 

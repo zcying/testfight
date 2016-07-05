@@ -242,6 +242,7 @@
     <Content Include="testfight\res\enearchersteady.png" />
     <Content Include="testfight\res\enearcherwalk.plist" />
     <Content Include="testfight\res\enearcherwalk.png" />
+    <Content Include="testfight\res\enearrow.png" />
     <Content Include="testfight\res\enecard1.png" />
     <Content Include="testfight\res\enecard2.png" />
     <Content Include="testfight\res\enecard3.png" />
@@ -266,6 +267,7 @@
     <Content Include="testfight\res\myarchersteady.png" />
     <Content Include="testfight\res\myarcherwalk.plist" />
     <Content Include="testfight\res\myarcherwalk.png" />
+    <Content Include="testfight\res\myarrow.png" />
     <Content Include="testfight\res\mycard1.png" />
     <Content Include="testfight\res\mycard2.png" />
     <Content Include="testfight\res\mycard3.png" />

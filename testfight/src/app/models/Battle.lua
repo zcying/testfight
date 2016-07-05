@@ -56,7 +56,7 @@ function Battle:initCard()
                      myfront={typ=Battle.SOLDER_TYPE_ARCHER,hp=1400,cardname='mycard3.png',atk,def,pos,speed},
                      enehead={typ=Battle.SOLDER_TYPE_HORSE,hp=1900,cardname='enecard1.png',atk,def,pos,speed},
                      enemid={typ=Battle.SOLDER_TYPE_INFANTRY,hp=2888,cardname='enecard2.png',atk,def,pos,speed},
-                     enefront={typ=Battle.SOLDER_TYPE_HORSE,hp=1500,cardname='enecard3.png',atk,def,pos,speed}}    
+                     enefront={typ=Battle.SOLDER_TYPE_ARCHER,hp=1500,cardname='enecard3.png',atk,def,pos,speed}}    
 end
 
 

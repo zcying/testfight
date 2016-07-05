@@ -72,7 +72,7 @@ function Game:ctor()
             scheduler.performWithDelayGlobal(
                 function()
                     self:getBattle() 
-                end,1.5) 
+                end,1) 
         end,1)
     --self:getBattle()
     --testlable
@@ -423,9 +423,9 @@ function Game:addSoldersOnCard(soc,solderpos,cardpos)
                     :addTo(self)
     local soldernum=Game:getSolderNum(soc.card:getHp())
     --printLog(myorene)
-    soc.solders=Solders.new(soldernum,myorene,soc.card:getType())
+    soc.solders=Solders.new(soldernum,myorene,soc.card:getType(),soc.card:getCardName())
                     :pos(solderpos.x,solderpos.y)
-                    :addTo(self)    
+                    :addTo(self)
 end
 
 function Game:getSolderNum(cardhp)
@@ -544,6 +544,7 @@ function Game:getReady()
     self.enefront.solders:moveForward(efx,efy)
     self.enemid.solders:moveForward(emx,emy)
     self.enehead.solders:moveForward(ehx,ehy)
+ 
 end
 
 --有兵阵死光自动补位
@@ -572,8 +573,11 @@ function Game:getBattle()
                         cc.DelayTime:create(1.5),
                         cc.CallFunc:create(function()
                             roundlabel:setString('round'..i)
+                            --printLog('myfront',self.myfront.solders.portrait:getPositionX())
                             self[attack.atkfrom].card:attack()--攻击卡牌显示
-                            self[attack.atkfrom].solders:attackForever()--一次兵阵攻击
+                            --self[attack.atkfrom].solders:attackForever()--兵阵攻击
+                            self[attack.atkfrom].solders:portraitUp()--小头像突出
+                            --printLog(attack.atkfrom,self[attack.atkfrom].solders:getPortPos().x..','..self[attack.atkfrom].solders:getPortPos().y)
                             --local atklabel=cc.ui.UILabel.new({text=attack['atktype'..l],size=36}):pos(self[attack.atkfrom].card:getPosition()):addTo(self)
                             for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
                                 local beforhp=self[k].card:getHp()
@@ -586,12 +590,13 @@ function Game:getBattle()
                                         else
                                             self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
                                         end
+                                        --printLog(k,self[k].solders:getPortPos().x..','..self[k].solders:getPortPos().y)
                                         --self[attack.atkfrom].solders:steady()--攻击完待命
                                         self[attack.atkfrom].card:back()--卡牌回位
-                                        self[k].solders:toRectandAtk ()
-                                        --self:removeChild(atklabel)
+                                        self[attack.atkfrom].solders:portraitDown()
+                                        self[k].solders:toRectandAtk()
                                     end,
-                                    self[attack.atkfrom].solders:getAtktime()--攻击时间
+                                    self[attack.atkfrom].solders:getAtktime()+0.2--攻击时间
                                )    
                             end
                         end

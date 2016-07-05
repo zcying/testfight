@@ -11,10 +11,11 @@ local SolderBase=import(".SolderBase")
 local SolderHorse=import(".SolderHorse")
 local SolderArcher=import(".SolderArcher")
 local SolderInfantry=import(".SolderInfantry")
-function Solders:ctor(soldernum,myorene,typ)
+function Solders:ctor(soldernum,myorene,typ,cardname)
     self.soldernum=soldernum    --兵数量
     self.typ=typ                --兵种
     self.myorene=myorene        --我方敌方
+    self.cardname=cardname
     self.solders={}             --兵阵
     self.solderspos={}          --单兵初始位置
     self.actionAtc=nil
@@ -22,10 +23,12 @@ function Solders:ctor(soldernum,myorene,typ)
     self.walktime=nil
     self.atktime=nil
     self.steadytime=nil
-    --self.solderstype=Solders.SOLDERS_TYPE_HORSE --方阵兵种
+    self.portrait=nil           --头像
+    self.portpos=nil
+    --self.originpos=nil
     self:initSoldersPos()--初始化点位
     self:initSolders()--初始化兵阵
-    
+
 end
 
 function Solders:getSoldernum()
@@ -115,6 +118,12 @@ function Solders:initSolders()
         local y=self.rectpos[i][2]
         self.solderspos[i]=cc.p(x,y)
     end
+    self.portrait=display.newSprite(self.cardname)
+                  :align(display.CENTER)
+                  :scale(0.4)
+                  :pos(self.solders[1]:getPositionX()-50,self.solders[1]:getPositionY()+40)
+                  :addTo(self)
+    --printLog(self.cardname)
     self.speed=self.solders[1]:getSpeed()
     self.walktime=self.solders[1].walktime
     self.atktime=self.solders[1].atktime
@@ -156,6 +165,14 @@ function Solders:reformat()
                              end
                             })
     end
+end
+
+function Solders:portraitUp()
+    self.portrait:scale(0.7)
+end
+
+function Solders:portraitDown()
+    self.portrait:scale(0.4)
 end
 
 --变方形并待命
@@ -229,9 +246,10 @@ function Solders:moveForward(px,py)
             self.wedgepos[i][1]=self.wedgepos[i][1]+px
             self.wedgepos[i][2]=self.wedgepos[i][2]+py
         end
+        local ltime=math.sqrt(px*px+py*py)/self.speed
         for _,k in pairs(self.solders) do--整体前进
             k:walk()
-            k.moveAciton=transition.moveBy(k,{time=math.sqrt(px*px+py*py)/self.speed,
+            k.moveAciton=transition.moveBy(k,{time=ltime,
                                               x=px,y=py,
                                               onComplete=function()
                                                  k:attackForever()
@@ -239,6 +257,14 @@ function Solders:moveForward(px,py)
                                              })
                 :setTag(1)
         end
+        transition.moveBy(self.portrait,{time=ltime,x=px,y=py,onComplete=function()
+                    self.portpos=self:convertToWorldSpace(cc.p(self.portrait:getPosition()))
+                    --printLog('portraitpos',self.portpos.x..','..self.portpos.y)
+        end})
+end
+
+function Solders:getPortPos()
+    return self.portpos
 end
 
 --停止所有动作
@@ -248,6 +274,8 @@ function Solders:stop()
         k:stopActionByTag(1)
     end
 end
+
+
 
 --待命
 function Solders:steady()
@@ -430,8 +458,8 @@ function Solders:getDeadkey(dienum)
     return deadkeys
 end
 
-function Solders:getLeadPos()
-    return self.solders[1]:getPosition()
-end
+--function Solders:getLeadPos()
+--    return self.solders[1]:getPosition()
+--end
 
 return Solders

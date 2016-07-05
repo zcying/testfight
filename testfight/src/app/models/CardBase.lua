@@ -11,10 +11,11 @@ function CardBase:ctor(hp,cardname,myorene,typ)
     
     self.hp=hp
     self.typ=typ
+    self.cardname=cardname
     --self.def=def
     --self.atk=atk
     self.myorene=myorene 
-    self.sprite=display.newSprite(cardname)
+    self.sprite=display.newSprite(self.cardname)
                                   :addTo(self)
     local hpposy=self.sprite:getPositionY()-10-self.sprite:getContentSize().height/2
     if self.myorene=='ene'then 
@@ -35,6 +36,10 @@ end
 
 function CardBase:getHp()
     return self.hp
+end
+
+function CardBase:getCardName()
+    return self.cardname
 end
 
 function CardBase:setHp(hp,rate)
