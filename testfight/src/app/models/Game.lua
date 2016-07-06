@@ -74,8 +74,273 @@ function Game:ctor()
                     self:getBattle() 
                 end,1) 
         end,1)
-    --self:getBattle()
-    --testlable
+    --self:showTest()
+end
+
+function Game:onEnter()
+    
+end
+
+function Game:initCardsPara()--从battle获取card的初始参数
+    for k,v in pairs(self.cardkey)do
+        local myorene=string.sub(v,1,1)
+        if myorene=='m' then 
+            myorene='my'
+        else 
+            myorene='ene'
+        end
+        self[v]={cardpara=self.battle:getCardbyKey(v),card,solders,myorene=myorene}
+    end
+--    self.myhead={cardpara=self.battle:getCardbyKey('myhead'),card,solders,myorene='my'}--我军大本营
+--    self.mymid={cardpara=self.battle:getCardbyKey('mymid'),card,solders,myorene='my'}  --中军
+--    self.myfront={cardpara=self.battle:getCardbyKey('myfront'),card,solders,myorene='my'}--前锋
+--    self.enehead={cardpara=self.battle:getCardbyKey('enehead'),card,solders,myorene='ene'}--敌军
+--    self.enemid={cardpara=self.battle:getCardbyKey('enemid'),card,solders,myorene='ene'}  
+--    self.enefront={cardpara=self.battle:getCardbyKey('enefront'),card,solders,myorene='ene'}
+end
+
+function Game:initSoldersAndCards()--初始化card和solders
+    self:addSoldersOnCard(self.myhead,MYHEADPOS,MYHEADCARDPOS)
+    self:addSoldersOnCard(self.mymid,MYMIDPOS,MYMIDCARDPOS)
+    self:addSoldersOnCard(self.myfront,MYFRONTPOS,MYFRONTCARDPOS)
+    self:addSoldersOnCard(self.enehead,ENEHEADPOS,ENEHEADCARDPOS)
+    self:addSoldersOnCard(self.enemid,ENEMIDPOS,ENEMIDCARDPOS)
+    self:addSoldersOnCard(self.enefront,ENEFRONTPOS,ENEFRONTCARDPOS)
+end
+
+--根据卡牌类别添加兵阵
+--卡牌血量：兵量：阵型 
+--卡牌类型：兵种：速度、攻击距离等
+--soc:solders on card,a table including cardparameter,solders and card
+function Game:addSoldersOnCard(soc,solderpos,cardpos)
+    if soc.cardpara==nil then return end
+    local myorene=soc.myorene
+    local hp=soc.cardpara.hp
+    local cardname=soc.cardpara.cardname
+    local typ=soc.cardpara.typ
+    soc.card=CardBase.new(hp,cardname,myorene,typ)
+                    :pos(cardpos.x,cardpos.y)
+                    :addTo(self)
+    local soldernum=Game:getSolderNum(soc.card:getHp())
+    --printLog(myorene)
+    soc.solders=Solders.new(soldernum,myorene,soc.card:getType(),soc.card:getCardName())
+                    :pos(solderpos.x,solderpos.y)
+                    :addTo(self)
+end
+
+function Game:getSolderNum(cardhp)
+--    if math.ceil(cardhp/20)==cardhp/20 then
+--        return cardhp/20
+--    else
+--        return math.ceil(cardhp/20)
+--    end
+    local hp=cardhp
+    if hp>0 and hp<=10 then
+        return 1
+    elseif hp>10 and hp<=100 then
+        return math.ceil(hp/10)
+    elseif hp>100 and hp<=1000 then
+        return math.ceil(hp/60)+9
+    elseif  hp>1000 and hp<=2000 then
+        return math.ceil(hp/100)+15
+    elseif hp>2000 and hp<=10000 then
+        return math.ceil(hp/1000)+33
+    else return 44
+    end        
+end
+
+--moveby距离
+function Game:getDis(posfrom,posto)
+    return posto.x-posfrom.x, posto.y-posfrom.y
+end
+
+function Game:toRect()
+    for k,v in pairs(self.cardkey)do
+        if self[v].solders then
+            self[v].solders:toRect()
+        end
+    end   
+end
+
+--到初始站位
+function Game:getReady()
+    local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy,mf,mm,mh,ef,em,eh--6个初始移动距离
+    local mf=self.myfront.card:getType()--获取六个卡的兵种类型
+    local mm=self.mymid.card:getType()
+    local mh=self.myhead.card:getType()
+    local ef=self.enefront.card:getType()
+    local em=self.enemid.card:getType()
+    local eh=self.enehead.card:getType()
+--近战/远程两种兵，大营/中军/前锋三个初始位置，敌/我，2^3*2，16种初始站位
+    if mf==2 and mm==2 and mh==2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGMIDPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYLONGRIGHTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYLONGLEFTPOS)
+    elseif mf==2 and mm~=2 and mh==2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGHALFRIGHTPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEMIDPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYLONGHALFLEFTPOS)
+    elseif mf==2 and mm==2 and mh~=2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGHALFRIGHTPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYLONGHALFLEFTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEMIDPOS)
+    elseif mf==2 and mm~=2 and mh~=2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGMIDPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEHALFRIGHTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEHALFLEFTPOS)
+    elseif mf~=2 and mm==2 and mh==2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEMIDPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYLONGHALFRIGHTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYLONGHALFLEFTPOS)
+    elseif mf~=2 and mm~=2 and mh==2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEHALFRIGHTPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEHALFLEFTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYLONGMIDPOS)
+    elseif mf~=2 and mm==2 and mh~=2 then
+        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEHALFRIGHTPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYLONGMIDPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEHALFLEFTPOS)
+    else
+        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEMIDPOS)
+        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSERIGHTPOS)
+        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSELEFTPOS)
+    end
+    if eh==2 and em==2 and ef==2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGRIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENELONGLEFTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENELONGMIDPOS)
+    elseif eh==2 and em~=2 and ef==2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGHALFRIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEMIDPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENELONGHALFLEFTPOS)
+    elseif eh==2 and em==2 and ef~=2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGHALFRIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENELONGHALFLEFTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEMIDPOS)
+    elseif eh==2 and em~=2 and ef~=2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGMIDPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEHALFRIGHTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEHALFLEFTPOS)
+    elseif eh~=2 and em==2 and ef==2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEMIDPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENELONGHALFRIGHTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENELONGHALFLEFTPOS)
+    elseif eh~=2 and em~=2 and ef==2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEHALFRIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEHALFLEFTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENELONGMIDPOS)
+    elseif eh~=2 and em==2 and ef~=2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEHALFRIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENELONGMIDPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEHALFLEFTPOS)
+    elseif eh~=2 and em~=2 and ef~=2 then
+        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSERIGHTPOS)
+        emx,emy=self:getDis(ENEMIDPOS,ENECLOSELEFTPOS)
+        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEMIDPOS)
+    end
+    self.myfront.solders:moveForward(mfx,mfy)
+    self.mymid.solders:moveForward(mmx,mmy)
+    self.myhead.solders:moveForward(mhx,mhy)
+    self.enefront.solders:moveForward(efx,efy)
+    self.enemid.solders:moveForward(emx,emy)
+    self.enehead.solders:moveForward(ehx,ehy)
+ 
+end
+
+--有兵阵死光自动补位
+function Game:moveForward()
+    
+end
+
+--解析战斗过程
+function Game:getBattle()
+    local action={} 
+    local roundlabel=cc.ui.UILabel.new({
+        text='round0',
+        size=50,
+        x=display.cx,
+        y=display.height-50
+    }):align(display.CENTER):addTo(self)
+    for i=1,8 do --8回合
+        local round=self.report['round'..i]
+        if round==nil then
+            break 
+        end
+        for j=1,6 do --每回合两边各三张牌攻击，共6牌攻击
+            local attack=round['attack'..j]
+            if attack==nil then break end
+            for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
+                if  attack['atktype'..l]==nil then break end
+                action[#action+1]=transition.sequence({
+                    cc.DelayTime:create(1.8),--每张牌单次攻击时间间隔
+                    cc.CallFunc:create(function()
+                        roundlabel:setString('round'..i)
+                        --printLog('myfront',self.myfront.solders.portrait:getPositionX())
+                        self[attack.atkfrom].card:attack()--攻击卡牌显示
+                        --self[attack.atkfrom].solders:attackForever()--兵阵攻击
+                        self[attack.atkfrom].solders:showAttacking()--兵阵显示攻击状态
+                        --printLog(attack.atkfrom,self[attack.atkfrom].solders:getPortPos().x..','..self[attack.atkfrom].solders:getPortPos().y)
+                        --local atklabel=cc.ui.UILabel.new({text=attack['atktype'..l],size=36}):pos(self[attack.atkfrom].card:getPosition()):addTo(self)
+                        for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
+                            local beforhp=self[k].card:getHp()
+                            self[k].card:setHp(v,1)--扣血
+                            if v<0 then
+                                self[k].solders:showAttacked()
+                            end
+                            local afterhp=self[k].card:getHp()
+                            --self[attack.atkfrom].solders:attackForever(self[attack.atkfrom].solders:getPortPos(),self[k].solders:getPortPos())
+                            scheduler.performWithDelayGlobal(
+                                function()
+                                    if v<0 then
+                                        self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--被攻击死
+                                    else
+                                        self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
+                                    end
+                                    --printLog(k,self[k].solders:getPortPos().x..','..self[k].solders:getPortPos().y)
+                                    --self[attack.atkfrom].solders:steady()--攻击完待命
+                                    self[attack.atkfrom].card:back()--卡牌回位
+                                    self[attack.atkfrom].solders:endAttacking()
+                                    self[k].solders:endAttacked()
+                                    --self[k].solders:toRectandAtk()
+                                end,
+                                self[attack.atkfrom].solders:getAtktime()+0.5--攻击效果显示时间
+                            )    
+                        end
+                    end
+                )})
+            end
+        end
+    end
+    self:runAction(transition.sequence(action)) 
+end
+
+
+
+function Game:getMyHeadpos()
+
+end
+
+function Game:getMyMidpos()
+
+end
+
+function Game:getMyFirstpos()
+
+end
+
+function Game:getEneHeadpos()
+
+end
+
+function Game:getEneMidpos()
+
+end
+
+function Game:getEneFirstpos()
+
+end
+
+function Game:showTest()
     self.lable1=cc.ui.UILabel.new({--前进
         text='moveforward',
         x=display.width-300,
@@ -99,6 +364,7 @@ function Game:ctor()
                                 local ehx=ENELONGMIDPOS.x-ENEHEADPOS.x
                                 local ehy=ENELONGMIDPOS.y-ENEHEADPOS.y
                                 if event.name=='ended' then
+                                    --transition.moveTo(self.myhead.solders,{time=math.sqrt(mhx*mhx+mhy*mhy)/self.myhead.solders.speed,x=MYLONGHALFRIGHTPOS.x,y=MYLONGHALFRIGHTPOS.y})
                                     self.myhead.solders:moveForward(mhx,mhy)
                                     self.mymid.solders:moveForward(mmx,mmy)
                                     self.myfront.solders:moveForward(mfx,mfy)
@@ -121,10 +387,10 @@ function Game:ctor()
                                 if event.name=='ended' then
                                     self.myhead.solders:attack()
                                     self.mymid.solders:attack()
-                                    self.myfront.solders:attack()
+                                    self.myfront.solders:attack(self.myfront.solders:getPortPos(),self.enefront.solders:getPortPos())
                                     self.enehead.solders:attack()
                                     self.enemid.solders:attack()
-                                    self.enefront.solders:attack()
+                                    self.enefront.solders:attack(self.enefront.solders:getPortPos(),self.myfront.solders:getPortPos())
                                 end
                                 return true
                               end)
@@ -375,261 +641,6 @@ function Game:ctor()
 --            end
 --            return true
 --        end)
-end
-
-function Game:onEnter()
-    
-end
-
-function Game:initCardsPara()--从battle获取card的初始参数
-    for k,v in pairs(self.cardkey)do
-        local myorene=string.sub(v,1,1)
-        if myorene=='m' then 
-            myorene='my'
-        else 
-            myorene='ene'
-        end
-        self[v]={cardpara=self.battle:getCardbyKey(v),card,solders,myorene=myorene}
-    end
---    self.myhead={cardpara=self.battle:getCardbyKey('myhead'),card,solders,myorene='my'}--我军大本营
---    self.mymid={cardpara=self.battle:getCardbyKey('mymid'),card,solders,myorene='my'}  --中军
---    self.myfront={cardpara=self.battle:getCardbyKey('myfront'),card,solders,myorene='my'}--前锋
---    self.enehead={cardpara=self.battle:getCardbyKey('enehead'),card,solders,myorene='ene'}--敌军
---    self.enemid={cardpara=self.battle:getCardbyKey('enemid'),card,solders,myorene='ene'}  
---    self.enefront={cardpara=self.battle:getCardbyKey('enefront'),card,solders,myorene='ene'}
-end
-
-function Game:initSoldersAndCards()--初始化card和solders
-    self:addSoldersOnCard(self.myhead,MYHEADPOS,MYHEADCARDPOS)
-    self:addSoldersOnCard(self.mymid,MYMIDPOS,MYMIDCARDPOS)
-    self:addSoldersOnCard(self.myfront,MYFRONTPOS,MYFRONTCARDPOS)
-    self:addSoldersOnCard(self.enehead,ENEHEADPOS,ENEHEADCARDPOS)
-    self:addSoldersOnCard(self.enemid,ENEMIDPOS,ENEMIDCARDPOS)
-    self:addSoldersOnCard(self.enefront,ENEFRONTPOS,ENEFRONTCARDPOS)
-end
-
---根据卡牌类别添加兵阵
---卡牌血量：兵量：阵型 
---卡牌类型：兵种：速度、攻击距离等
---soc:solders on card,a table including cardparameter,solders and card
-function Game:addSoldersOnCard(soc,solderpos,cardpos)
-    if soc.cardpara==nil then return end
-    local myorene=soc.myorene
-    local hp=soc.cardpara.hp
-    local cardname=soc.cardpara.cardname
-    local typ=soc.cardpara.typ
-    soc.card=CardBase.new(hp,cardname,myorene,typ)
-                    :pos(cardpos.x,cardpos.y)
-                    :addTo(self)
-    local soldernum=Game:getSolderNum(soc.card:getHp())
-    --printLog(myorene)
-    soc.solders=Solders.new(soldernum,myorene,soc.card:getType(),soc.card:getCardName())
-                    :pos(solderpos.x,solderpos.y)
-                    :addTo(self)
-end
-
-function Game:getSolderNum(cardhp)
---    if math.ceil(cardhp/20)==cardhp/20 then
---        return cardhp/20
---    else
---        return math.ceil(cardhp/20)
---    end
-    local hp=cardhp
-    if hp>0 and hp<=10 then
-        return 1
-    elseif hp>10 and hp<=100 then
-        return math.ceil(hp/10)
-    elseif hp>100 and hp<=1000 then
-        return math.ceil(hp/60)+9
-    elseif  hp>1000 and hp<=2000 then
-        return math.ceil(hp/100)+15
-    elseif hp>2000 and hp<=10000 then
-        return math.ceil(hp/1000)+33
-    else return 44
-    end        
-end
-
---moveby距离
-function Game:getDis(posfrom,posto)
-    return posto.x-posfrom.x, posto.y-posfrom.y
-end
-
-function Game:toRect()
-    for k,v in pairs(self.cardkey)do
-        if self[v].solders then
-            self[v].solders:toRect()
-        end
-    end   
-end
-
---到初始站位
-function Game:getReady()
-    local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy,mf,mm,mh,ef,em,eh--6个初始移动距离
-    local mf=self.myfront.card:getType()--获取六个卡的兵种类型
-    local mm=self.mymid.card:getType()
-    local mh=self.myhead.card:getType()
-    local ef=self.enefront.card:getType()
-    local em=self.enemid.card:getType()
-    local eh=self.enehead.card:getType()
---近战/远程两种兵，大营/中军/前锋三个初始位置，敌/我，2^3*2，16种初始站位
-    if mf==2 and mm==2 and mh==2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGMIDPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYLONGRIGHTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYLONGLEFTPOS)
-    elseif mf==2 and mm~=2 and mh==2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGHALFRIGHTPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEMIDPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYLONGHALFLEFTPOS)
-    elseif mf==2 and mm==2 and mh~=2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGHALFRIGHTPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYLONGHALFLEFTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEMIDPOS)
-    elseif mf==2 and mm~=2 and mh~=2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGMIDPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEHALFRIGHTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEHALFLEFTPOS)
-    elseif mf~=2 and mm==2 and mh==2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEMIDPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYLONGHALFRIGHTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYLONGHALFLEFTPOS)
-    elseif mf~=2 and mm~=2 and mh==2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEHALFRIGHTPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEHALFLEFTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYLONGMIDPOS)
-    elseif mf~=2 and mm==2 and mh~=2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEHALFRIGHTPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYLONGMIDPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEHALFLEFTPOS)
-    else
-        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEMIDPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSERIGHTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSELEFTPOS)
-    end
-    if eh==2 and em==2 and ef==2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGRIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENELONGLEFTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENELONGMIDPOS)
-    elseif eh==2 and em~=2 and ef==2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGHALFRIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEMIDPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENELONGHALFLEFTPOS)
-    elseif eh==2 and em==2 and ef~=2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGHALFRIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENELONGHALFLEFTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEMIDPOS)
-    elseif eh==2 and em~=2 and ef~=2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGMIDPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEHALFRIGHTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEHALFLEFTPOS)
-    elseif eh~=2 and em==2 and ef==2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEMIDPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENELONGHALFRIGHTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENELONGHALFLEFTPOS)
-    elseif eh~=2 and em~=2 and ef==2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEHALFRIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEHALFLEFTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENELONGMIDPOS)
-    elseif eh~=2 and em==2 and ef~=2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEHALFRIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENELONGMIDPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEHALFLEFTPOS)
-    elseif eh~=2 and em~=2 and ef~=2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSERIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENECLOSELEFTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEMIDPOS)
-    end
-    self.myfront.solders:moveForward(mfx,mfy)
-    self.mymid.solders:moveForward(mmx,mmy)
-    self.myhead.solders:moveForward(mhx,mhy)
-    self.enefront.solders:moveForward(efx,efy)
-    self.enemid.solders:moveForward(emx,emy)
-    self.enehead.solders:moveForward(ehx,ehy)
- 
-end
-
---有兵阵死光自动补位
-function Game:moveForward()
-    
-end
-
---解析战斗过程
-function Game:getBattle()
-    local action={} 
-    local roundlabel=cc.ui.UILabel.new({
-        text='round0',
-        size=40,
-        x=display.cx,
-        y=display.height-50
-    }):addTo(self)
-    for i=1,8 do --8回合
-        local round=self.report['round'..i]
-        if round~=nil then 
-            for j=1,6 do --每回合两边各三张牌攻击，共6轮攻击
-                local attack=round['attack'..j]
-                if attack==nil then break end
-                    for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
-                        if  attack['atktype'..l]==nil then break end
-                        action[#action+1]=transition.sequence({
-                        cc.DelayTime:create(1.5),
-                        cc.CallFunc:create(function()
-                            roundlabel:setString('round'..i)
-                            --printLog('myfront',self.myfront.solders.portrait:getPositionX())
-                            self[attack.atkfrom].card:attack()--攻击卡牌显示
-                            --self[attack.atkfrom].solders:attackForever()--兵阵攻击
-                            self[attack.atkfrom].solders:portraitUp()--小头像突出
-                            --printLog(attack.atkfrom,self[attack.atkfrom].solders:getPortPos().x..','..self[attack.atkfrom].solders:getPortPos().y)
-                            --local atklabel=cc.ui.UILabel.new({text=attack['atktype'..l],size=36}):pos(self[attack.atkfrom].card:getPosition()):addTo(self)
-                            for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
-                                local beforhp=self[k].card:getHp()
-                                self[k].card:setHp(v,1)
-                                local afterhp=self[k].card:getHp()
-                                scheduler.performWithDelayGlobal(
-                                    function()
-                                        if v<0 then
-                                            self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--被攻击死
-                                        else
-                                            self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
-                                        end
-                                        --printLog(k,self[k].solders:getPortPos().x..','..self[k].solders:getPortPos().y)
-                                        --self[attack.atkfrom].solders:steady()--攻击完待命
-                                        self[attack.atkfrom].card:back()--卡牌回位
-                                        self[attack.atkfrom].solders:portraitDown()
-                                        self[k].solders:toRectandAtk()
-                                    end,
-                                    self[attack.atkfrom].solders:getAtktime()+0.2--攻击时间
-                               )    
-                            end
-                        end
-                        )})
-                    end       
-            end
-        end
-    end
-    self:runAction(transition.sequence(action)) 
-end
-
-function Game:getMyHeadpos()
-
-end
-
-function Game:getMyMidpos()
-
-end
-
-function Game:getMyFirstpos()
-
-end
-
-function Game:getEneHeadpos()
-
-end
-
-function Game:getEneMidpos()
-
-end
-
-function Game:getEneFirstpos()
-
 end
 
 return Game

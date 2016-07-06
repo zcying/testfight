@@ -25,6 +25,8 @@ function Solders:ctor(soldernum,myorene,typ,cardname)
     self.steadytime=nil
     self.portrait=nil           --头像
     self.portpos=nil
+    self.attackingcircle=display.newSprite('attacking.png'):align(display.CENTER):addTo(self):setVisible(false)
+    self.attackedcircle=display.newSprite('attacked.png'):align(display.CENTER):addTo(self):setVisible(false)
     --self.originpos=nil
     self:initSoldersPos()--初始化点位
     self:initSolders()--初始化兵阵
@@ -48,6 +50,8 @@ function Solders:initSoldersPos()
                       {-1,-4},{-3,-3},{-5,-2},{-7,-1},{-9,0},{-8,1},{-7,2},{-6,3},{-8,4},{-9,3},
                       {-10,2},{-11,1},{-12,0},{-10,-1},{-8,-2},{-6,-3},{-4,-4},{-2,-5},{0,-6},{2,-7},
                       {5,-7},{6,-6},{7,-5},{8,-4}}
+        self.attackingcircle:pos(-20,-20):setRotation(30)
+        self.attackedcircle:pos(-20,-20):setRotation(30)
     else 
         --敌方方形
         self.rectpos={{0,0},{2,-1},{3,0},{1,1},{-1,2},{-2,1},{-4,2},{-3,3},{-2,4},{0,3},
@@ -55,6 +59,8 @@ function Solders:initSoldersPos()
                       {5,2},{3,3},{1,4},{-1,5},{-3,6},{-4,5},{-5,4},{-6,3},{-8,4},{-7,5},
                       {-6,6},{-5,7},{-4,8},{-2,7},{0,6},{2,5},{4,4},{6,3},{8,2},{10,1},
                       {11,-1},{10,-2},{9,-3},{8,-4}}
+        self.attackingcircle:pos(20,10):setRotation(30)
+        self.attackedcircle:pos(20,10):setRotation(30)
     end
     for i=1,#self.rectpos do
         self.rectpos[i][1]=self.rectpos[i][1]*15
@@ -121,13 +127,34 @@ function Solders:initSolders()
     self.portrait=display.newSprite(self.cardname)
                   :align(display.CENTER)
                   :scale(0.4)
-                  :pos(self.solders[1]:getPositionX()-50,self.solders[1]:getPositionY()+40)
+                  :pos(-40,30)
                   :addTo(self)
     --printLog(self.cardname)
     self.speed=self.solders[1]:getSpeed()
     self.walktime=self.solders[1].walktime
     self.atktime=self.solders[1].atktime
     self.steadytime=self.solders[1].steadytime
+    self.portpos=self:convertToWorldSpace(cc.p(self.portrait:getPosition()))
+end
+
+function Solders:showAttacking()
+    self:portraitUp()
+    self.attackingcircle:setVisible(true)
+end
+
+function Solders:endAttacking()
+    self:portraitDown()
+    self.attackingcircle:setVisible(false)
+end
+
+function Solders:showAttacked()
+    self:portraitUp()
+    self.attackedcircle:setVisible(true)
+end
+
+function Solders:endAttacked()
+    self:portraitDown()
+    self.attackedcircle:setVisible(false)
 end
 
 --返回一次走路时间
@@ -195,7 +222,7 @@ function Solders:toRect()
 end
 
 --变方形并永远攻击
-function Solders:toRectandAtk()
+function Solders:toRectandAtk(posfrom,posto)
     self:getSoldernum()
     for i=1,self.soldernum do
         local oldposx,oldposy=self.solders[i]:getPosition()
@@ -233,7 +260,7 @@ function Solders:toWedge()
 end
 
 --兵阵前进
-function Solders:moveForward(px,py)
+function Solders:moveForward(px,py,posfrom,posto)
     --if self.handle==nil then
         --self:reformat()
         for _,k in pairs(self.solderspos) do--修正原始点位
@@ -247,6 +274,10 @@ function Solders:moveForward(px,py)
             self.wedgepos[i][2]=self.wedgepos[i][2]+py
         end
         local ltime=math.sqrt(px*px+py*py)/self.speed
+        transition.moveBy(self.portrait,{time=ltime,x=px,y=py,onComplete=function()
+                    self.portpos=self:convertToWorldSpace(cc.p(self.portrait:getPosition()))
+                    --printLog('portraitpos',self.portpos.x..','..self.portpos.y)
+        end})
         for _,k in pairs(self.solders) do--整体前进
             k:walk()
             k.moveAciton=transition.moveBy(k,{time=ltime,
@@ -257,10 +288,8 @@ function Solders:moveForward(px,py)
                                              })
                 :setTag(1)
         end
-        transition.moveBy(self.portrait,{time=ltime,x=px,y=py,onComplete=function()
-                    self.portpos=self:convertToWorldSpace(cc.p(self.portrait:getPosition()))
-                    --printLog('portraitpos',self.portpos.x..','..self.portpos.y)
-        end})
+        transition.moveBy(self.attackedcircle,{time=ltime,x=px,y=py})
+        transition.moveBy(self.attackingcircle,{time=ltime,x=px,y=py})
 end
 
 function Solders:getPortPos()
@@ -285,9 +314,9 @@ function Solders:steady()
 end
 
 --一次攻击
-function Solders:attack()
+function Solders:attack(posfrom,posto)
     for _,k in pairs(self.solders)do
-        k:attack()
+        k:attack(posfrom,posto)
     end
 end
 
@@ -431,7 +460,7 @@ function Solders:solderNeverDie(num)
         self.solders[i]:align(display.CENTER)
                        :pos(x,y)
                        :addTo(self)
-                       :steady()
+                       :attackForever()
 --        local x=self.wedgepos[i][1]
 --        local y=self.wedgepos[i][2]
 --        local x=self.rectpos[i][1]

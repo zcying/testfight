@@ -9,7 +9,7 @@ SolderBase.SOLDER_TYPE_INFANTRY=3
 
 
 function SolderBase:ctor(myorene)
-    self.atktime=12/15
+    self.atktime=1
     self.walktime=4/15
     self.steadytime=7/12
     self.myorene=myorene
@@ -110,6 +110,10 @@ function SolderBase:stop()
         :stopActionByTag(1)--walk
         :stopActionByTag(3)--steady
         :stopActionByTag(4)--atkforever
+    if self.arrow then
+        self.arrow:stopActionByTag(6)
+        self.arrow:setVisible(false)
+    end
     --transition.stopTarget()
 end
 

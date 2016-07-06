@@ -4,7 +4,7 @@ local SolderInfantry = class("SolderInfantry",SolderBase)
 
 function SolderInfantry:ctor(myorene)
     SolderInfantry.super.ctor(self,myorene)
-    self.atktime=10/15
+    self.atktime=12/15
     self.walktime=4/15
     self.steadytime=7/12
     self:addAnimationCache()
