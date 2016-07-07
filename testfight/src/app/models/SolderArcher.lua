@@ -71,8 +71,8 @@ function SolderArcher:attackForever()
         c2=cc.p(p2.x/4*3,p2.y*2.5)     
         action=cc.Sequence:create(
                         cc.DelayTime:create(0.3),
-                        cc.Spawn:create(cc.BezierBy:create(0.7,{c1,c2,p2}),
-                                        cc.RotateBy:create(0.7,100)),
+                        cc.Spawn:create(cc.BezierBy:create(0.65,{c1,c2,p2}),
+                                        cc.RotateBy:create(0.65,100)),
                         cc.CallFunc:create(function() 
                                 self.arrow:pos(40,40)
                                           :setRotation(-60)
@@ -80,11 +80,11 @@ function SolderArcher:attackForever()
                         )
     else
         c1=cc.p(p2.x/4*3,-p2.y*0.5)
-        c2=cc.p(p2.x/4,-p2.y*0.5) 
+        c2=cc.p(p2.x/4,-p2.y*0.8) 
         action=cc.Sequence:create(
                         cc.DelayTime:create(0.3),
-                        cc.Spawn:create(cc.BezierBy:create(0.7,{c1,c2,p2}),
-                                        cc.RotateBy:create(0.7,-100)),
+                        cc.Spawn:create(cc.BezierBy:create(0.65,{c1,c2,p2}),
+                                        cc.RotateBy:create(0.65,-100)),
                         cc.CallFunc:create(function() 
                                 self.arrow:pos(40,40)
                                           :setRotation(30)
@@ -98,13 +98,13 @@ end
 function SolderArcher:getArrowPos()
     local p2,px,py
     if self.myorene=='my'then
-        p2=cc.p(250,160)
-        px=30-math.random(0,60)
-        py=20-math.random(0,40)
+        p2=cc.p(220,140)
+        px=40-math.random(0,80)
+        py=30-math.random(0,60)
     else
-        p2=cc.p(-280,-180)
-        px=30-math.random(0,60)
-        py=20-math.random(0,40)
+        p2=cc.p(-250,-160)
+        px=40-math.random(0,80)
+        py=30-math.random(0,60)
     end
     return cc.p(p2.x+px,p2.y+py)
 end

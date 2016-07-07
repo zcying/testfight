@@ -237,6 +237,12 @@
     <Content Include="testfight\res\attacked.png" />
     <Content Include="testfight\res\attacking.png" />
     <Content Include="testfight\res\background.jpg" />
+    <Content Include="testfight\res\dieenecard1.png" />
+    <Content Include="testfight\res\dieenecard2.png" />
+    <Content Include="testfight\res\dieenecard3.png" />
+    <Content Include="testfight\res\diemycard1.png" />
+    <Content Include="testfight\res\diemycard2.png" />
+    <Content Include="testfight\res\diemycard3.png" />
     <Content Include="testfight\res\enearcheratk.plist" />
     <Content Include="testfight\res\enearcheratk.png" />
     <Content Include="testfight\res\enearcherdie.png" />

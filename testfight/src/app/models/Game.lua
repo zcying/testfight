@@ -8,19 +8,27 @@ local Battle=import('.Battle')
 local scheduler = require("framework.scheduler")  
 
 --兵阵初始点位
-local MYHEADPOS=cc.p(200,100)
-local MYMIDPOS=cc.p(300,160)
-local MYFRONTPOS=cc.p(400,220)
+--local MYHEADPOS=cc.p(200,100)
+--local MYMIDPOS=cc.p(300,160)
+--local MYFRONTPOS=cc.p(400,220)
+local MYHEADPOS=cc.p(300,160)
+local MYMIDPOS=cc.p(400,220)
+local MYFRONTPOS=cc.p(500,280)
 local ENEHEADPOS=cc.p(900,520)
 local ENEMIDPOS=cc.p(800,460)
 local ENEFRONTPOS=cc.p(700,400)
 
 --我方近战战斗点位
-local MYCLOSEMIDPOS=cc.p(500,280)
-local MYCLOSELEFTPOS=cc.p(290,343)
-local MYCLOSEHALFLEFTPOS=cc.p(380,316)
-local MYCLOSERIGHTPOS=cc.p(710,217)
-local MYCLOSEHALFRIGHTPOS=cc.p(620,244)
+--local MYCLOSEMIDPOS=cc.p(500,280)
+--local MYCLOSELEFTPOS=cc.p(290,343)
+--local MYCLOSEHALFLEFTPOS=cc.p(380,316)
+--local MYCLOSERIGHTPOS=cc.p(710,217)
+--local MYCLOSEHALFRIGHTPOS=cc.p(620,244)
+local MYCLOSEMIDPOS=cc.p(600,340)
+local MYCLOSELEFTPOS=cc.p(390,403)
+local MYCLOSEHALFLEFTPOS=cc.p(480,376)
+local MYCLOSERIGHTPOS=cc.p(810,277)
+local MYCLOSEHALFRIGHTPOS=cc.p(720,304)
 
 --敌方近战战斗点位
 local ENECLOSEMIDPOS=cc.p(600,340)
@@ -31,10 +39,14 @@ local ENECLOSEHALFRIGHTPOS=cc.p(720,304)
 
 --我方远程战斗点位
 local MYLONGMIDPOS=MYFRONTPOS
-local MYLONGLEFTPOS=cc.p(190,283)
-local MYLONGHALFLEFTPOS=cc.p(280,256)
-local MYLONGRIGHTPOS=cc.p(610,157)
-local MYLONGHALFRIGHTPOS=cc.p(520,184)
+--local MYLONGLEFTPOS=cc.p(190,283)
+--local MYLONGHALFLEFTPOS=cc.p(280,256)
+--local MYLONGRIGHTPOS=cc.p(610,157)
+--local MYLONGHALFRIGHTPOS=cc.p(520,184)
+local MYLONGLEFTPOS=cc.p(290,343)
+local MYLONGHALFLEFTPOS=cc.p(380,316)
+local MYLONGRIGHTPOS=cc.p(710,217)
+local MYLONGHALFRIGHTPOS=cc.p(620,244)
 
 --敌方远程战斗点位
 local ENELONGMIDPOS=ENEFRONTPOS
@@ -135,7 +147,9 @@ function Game:getSolderNum(cardhp)
 --        return math.ceil(cardhp/20)
 --    end
     local hp=cardhp
-    if hp>0 and hp<=10 then
+    if hp==0 then
+        return 0
+    elseif hp>0 and hp<=10 then
         return 1
     elseif hp>10 and hp<=100 then
         return math.ceil(hp/10)
@@ -247,13 +261,9 @@ function Game:getReady()
  
 end
 
---有兵阵死光自动补位
-function Game:moveForward()
-    
-end
-
 --解析战斗过程
 function Game:getBattle()
+    local torecttime=0
     local action={} 
     local roundlabel=cc.ui.UILabel.new({
         text='round0',
@@ -272,49 +282,70 @@ function Game:getBattle()
             for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
                 if  attack['atktype'..l]==nil then break end
                 action[#action+1]=transition.sequence({
-                    cc.DelayTime:create(1.8),--每张牌单次攻击时间间隔
+--                    cc.DelayTime:create(2.8),--每张牌单次攻击时间间隔
                     cc.CallFunc:create(function()
                         roundlabel:setString('round'..i)
-                        --printLog('myfront',self.myfront.solders.portrait:getPositionX())
                         self[attack.atkfrom].card:attack()--攻击卡牌显示
-                        --self[attack.atkfrom].solders:attackForever()--兵阵攻击
+                        for n,m in pairs(self.cardkey) do
+                            if m~=attack.atkfrom then   
+                                self[m].card:setOpacity(150)--不攻击的暗
+                                self[m].solders:setOpacity(150)
+                            end 
+                        end
                         self[attack.atkfrom].solders:showAttacking()--兵阵显示攻击状态
                         --printLog(attack.atkfrom,self[attack.atkfrom].solders:getPortPos().x..','..self[attack.atkfrom].solders:getPortPos().y)
-                        --local atklabel=cc.ui.UILabel.new({text=attack['atktype'..l],size=36}):pos(self[attack.atkfrom].card:getPosition()):addTo(self)
                         for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
                             local beforhp=self[k].card:getHp()
-                            self[k].card:setHp(v,1)--扣血
                             if v<0 then
-                                self[k].solders:showAttacked()
+                                self[k].solders:showAttacked()--被攻击的亮
+                                self[k].card:setOpacity(255)
+                                self[k].solders:setOpacity(255)
                             end
-                            local afterhp=self[k].card:getHp()
-                            --self[attack.atkfrom].solders:attackForever(self[attack.atkfrom].solders:getPortPos(),self[k].solders:getPortPos())
                             scheduler.performWithDelayGlobal(
                                 function()
+                                    self[k].card:setHp(v,1)--扣血
+                                    local afterhp=self[k].card:getHp()
                                     if v<0 then
                                         self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--被攻击死
                                     else
                                         self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
                                     end
-                                    --printLog(k,self[k].solders:getPortPos().x..','..self[k].solders:getPortPos().y)
-                                    --self[attack.atkfrom].solders:steady()--攻击完待命
                                     self[attack.atkfrom].card:back()--卡牌回位
                                     self[attack.atkfrom].solders:endAttacking()
                                     self[k].solders:endAttacked()
-                                    --self[k].solders:toRectandAtk()
+                                    for n,m in pairs(self.cardkey)do--所有亮
+                                        self[m].card:setOpacity(255)
+                                        self[m].solders:setOpacity(255)
+                                    end
+                                    if afterhp==0 and self[k].card:getState() then
+                                        self[k].card:die()
+                                        torecttime=1
+                                    end
                                 end,
-                                self[attack.atkfrom].solders:getAtktime()+0.5--攻击效果显示时间
+                                self[attack.atkfrom].solders:getAtktime()+0.8--攻击效果显示时间
                             )    
                         end
                     end
-                )})
+                ),
+                cc.DelayTime:create(2), --每张牌单次攻击时间间隔     
+                cc.CallFunc:create(function()--没次攻击完如果有兵阵死光就是全部整队，并调整各阵位置
+                    for n,m in pairs(self.cardkey) do
+                        if self[m].card:getState()==nil and torecttime==1 then
+                        torecttime=0
+                            for o,p in pairs(self.cardkey)do 
+                                if self[p].card:getState() then
+                                    self[p].solders:toRectandAtk()
+                                end
+                            end
+                        end
+                    end                    
+                end)         
+                })
             end
         end
     end
     self:runAction(transition.sequence(action)) 
 end
-
-
 
 function Game:getMyHeadpos()
 

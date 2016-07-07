@@ -20,24 +20,22 @@ function Battle:ctor()
     self.bettlereport={
         round0={},
         round1={
-            attack1={atkfrom='mymid',atktype1='diewuhonglian',atkto1={enemid=-250,enefront=-124,myhead=200,myfront=120},
+            attack1={atkfrom='mymid',atktype1='diewuhonglian',atkto1={enemid=-250,enefront=-300,myhead=200,myfront=120},
                                      atktype2='normal',atkto2={enemid=-145}},
-            attack2={atkfrom='myhead',atktype1='jianlan',atkto1={enefront=-293,enemid=-391},
+            attack2={atkfrom='myhead',atktype1='jianlan',atkto1={enefront=-500,enemid=-391},
                                       atktype2='normal',atkto2={enemid=-539}},
             attack3={atkfrom='myfront',atktype1='normal',atkto1={enehead=-976}},
             attack4={atkfrom='enehead',atktype1='normal',atkto1={myhead=-688}},
-            attack5={atkfrom='enefront',atktype1='normal',atkto1={myfront=-288}},
-            attack6={atkfrom='enemid',atktype1='normal',atkto1={mymid=-488}}
+            attack5={atkfrom='enefront',atktype1='normal',atkto1={myfront=-520}},
+            attack6={atkfrom='enemid',atktype1='normal',atkto1={myfront=-1000}}
                 },
         round2={
-            attack1={atkfrom='mymid',atktype1='diewuhonglian',atkto1={enemid=-250,enefront=-124,myhead=200,myfront=120},
+            attack1={atkfrom='mymid',atktype1='diewuhonglian',atkto1={enemid=-250,enefront=-300,myhead=200},
                                      atktype2='normal',atkto2={enemid=-145}},
-            attack2={atkfrom='myhead',atktype1='jianlan',atkto1={enefront=-293,enemid=-391},
+            attack2={atkfrom='myhead',atktype1='jianlan',atkto1={enefront=-400,enemid=-391},
                                       atktype2='normal',atkto2={enemid=-539}},
-            attack3={atkfrom='myfront',atktype1='normal',atkto1={enehead=-276}},
-            attack4={atkfrom='enehead',atktype1='normal',atkto1={mymid=-588}},
-            attack5={atkfrom='enefront',atktype1='normal',atkto1={myhead=-888}},
-            attack6={atkfrom='enemid',atktype1='normal',atkto1={mymid=-488}}
+            attack3={atkfrom='enehead',atktype1='normal',atkto1={mymid=-588}},
+            attack4={atkfrom='enemid',atktype1='normal',atkto1={myhead=-488}}
         },
         round3=nil,
         round4=nil,
@@ -52,11 +50,11 @@ end
 --初始化卡牌，my/ene_head/mid/front,我/敌_大营/中军/前锋，typ兵阵类型，hp，cardname卡图片文件名
 function Battle:initCard()
     self.battlecard={myhead={typ=Battle.SOLDER_TYPE_ARCHER,hp=2700,cardname='mycard1.png',atk,def,pos,speed},
-                     mymid={typ=Battle.SOLDER_TYPE_ARCHER,hp=2100,cardname='mycard2.png',atk,def,pos,speed},
-                     myfront={typ=Battle.SOLDER_TYPE_HORSE,hp=1400,cardname='mycard3.png',atk,def,pos,speed},
-                     enehead={typ=Battle.SOLDER_TYPE_HORSE,hp=1900,cardname='enecard1.png',atk,def,pos,speed},
+                     mymid={typ=Battle.SOLDER_TYPE_HORSE,hp=2100,cardname='mycard2.png',atk,def,pos,speed},
+                     myfront={typ=Battle.SOLDER_TYPE_INFANTRY,hp=1400,cardname='mycard3.png',atk,def,pos,speed},
+                     enehead={typ=Battle.SOLDER_TYPE_ARCHER,hp=1900,cardname='enecard1.png',atk,def,pos,speed},
                      enemid={typ=Battle.SOLDER_TYPE_ARCHER,hp=2888,cardname='enecard2.png',atk,def,pos,speed},
-                     enefront={typ=Battle.SOLDER_TYPE_INFANTRY,hp=1500,cardname='enecard3.png',atk,def,pos,speed}}    
+                     enefront={typ=Battle.SOLDER_TYPE_HORSE,hp=1500,cardname='enecard3.png',atk,def,pos,speed}}    
 end
 
 function Battle:getCardbyKey(cardkey)

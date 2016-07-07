@@ -30,7 +30,6 @@ function Solders:ctor(soldernum,myorene,typ,cardname)
     --self.originpos=nil
     self:initSoldersPos()--初始化点位
     self:initSolders()--初始化兵阵
-
 end
 
 function Solders:getSoldernum()
@@ -42,6 +41,13 @@ function Solders:getType()
     return self.typ
 end
 
+function Solders:setOpacity(op)
+    for _,k in pairs(self.solders)do 
+        k:setOpacity(op)
+    end
+    self.portrait:setOpacity(op)
+end
+
 function Solders:initSoldersPos()
     if self.myorene=='my' then
         --我方方形,最多到32个
@@ -50,8 +56,8 @@ function Solders:initSoldersPos()
                       {-1,-4},{-3,-3},{-5,-2},{-7,-1},{-9,0},{-8,1},{-7,2},{-6,3},{-8,4},{-9,3},
                       {-10,2},{-11,1},{-12,0},{-10,-1},{-8,-2},{-6,-3},{-4,-4},{-2,-5},{0,-6},{2,-7},
                       {5,-7},{6,-6},{7,-5},{8,-4}}
-        self.attackingcircle:pos(-20,-20):setRotation(30)
-        self.attackedcircle:pos(-20,-20):setRotation(30)
+        self.attackingcircle:pos(-60,-20):setRotation(30)
+        self.attackedcircle:pos(-60,-20):setRotation(30)
     else 
         --敌方方形
         self.rectpos={{0,0},{2,-1},{3,0},{1,1},{-1,2},{-2,1},{-4,2},{-3,3},{-2,4},{0,3},
@@ -59,8 +65,8 @@ function Solders:initSoldersPos()
                       {5,2},{3,3},{1,4},{-1,5},{-3,6},{-4,5},{-5,4},{-6,3},{-8,4},{-7,5},
                       {-6,6},{-5,7},{-4,8},{-2,7},{0,6},{2,5},{4,4},{6,3},{8,2},{10,1},
                       {11,-1},{10,-2},{9,-3},{8,-4}}
-        self.attackingcircle:pos(20,10):setRotation(30)
-        self.attackedcircle:pos(20,10):setRotation(30)
+        self.attackingcircle:pos(30,40):setRotation(30)
+        self.attackedcircle:pos(30,40):setRotation(30)
     end
     for i=1,#self.rectpos do
         self.rectpos[i][1]=self.rectpos[i][1]*15
@@ -114,8 +120,12 @@ function Solders:initSolders()
         --按方形排
 --        local x=self.rectpos[i][1]
 --        local y=self.rectpos[i][2]
-        self.solders[i]:align(display.CENTER)
-                       :pos(x,y)
+        if self.myorene=='my' then
+            self.solders[i]:align(display.RIGHT_CENTER)
+        else 
+            self.solders[i]:align(display.CENTER_BOTTOM)
+        end
+        self.solders[i]:pos(x,y)
                        :addTo(self)
                        :steady()
 --        local x=self.wedgepos[i][1]
@@ -125,9 +135,8 @@ function Solders:initSolders()
         self.solderspos[i]=cc.p(x,y)
     end
     self.portrait=display.newSprite(self.cardname)
-                  :align(display.CENTER)
                   :scale(0.4)
-                  :pos(-40,30)
+                  :pos(0,20)
                   :addTo(self)
     --printLog(self.cardname)
     self.speed=self.solders[1]:getSpeed()
@@ -195,7 +204,7 @@ function Solders:reformat()
 end
 
 function Solders:portraitUp()
-    self.portrait:scale(0.7)
+    self.portrait:scale(0.5)
 end
 
 function Solders:portraitDown()
@@ -204,7 +213,7 @@ end
 
 --变方形并待命
 function Solders:toRect()
-    self:getSoldernum()
+    if self:getSoldernum()==0 then return end
     for i=1,self.soldernum do
         local oldposx,oldposy=self.solders[i]:getPosition()
         local newposx=self.rectpos[i][1]
@@ -342,7 +351,7 @@ function Solders:die(deadnum)
         return
     end
     self:getSoldernum()
-    if self.soldernum-deadnum<=0 then
+    if self.soldernum-deadnum<0 then
         return
     end
     local deadkeys=self:getDeadkey(deadnum)
@@ -359,6 +368,9 @@ function Solders:die(deadnum)
                                    delay=0.5,
                                    onComplete=function()
                                        sprite:removeSelf()
+                                       if self.soldernum==deadnum then
+                                           self.portrait:setVisible(false)
+                                       end
                                        --table.remove(self.solders,deadkeys[i])
                                        --self.soldernum=#(self.solders)
                                        --printLog(self.soldernum)
@@ -366,7 +378,6 @@ function Solders:die(deadnum)
     table.remove(self.solders,deadkeys[i])
     end
 end
-
 
 
 --按实际数量像死一样跑

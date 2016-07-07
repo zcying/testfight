@@ -112,7 +112,12 @@ function SolderBase:stop()
         :stopActionByTag(4)--atkforever
     if self.arrow then
         self.arrow:stopActionByTag(6)
-        self.arrow:setVisible(false)
+        self.arrow:setVisible(false):pos(40,40)
+        if self.myorene=='my' then
+            self.arrow:setRotation(-60)
+        else 
+            self.arrow:setRotation(30)
+        end
     end
     --transition.stopTarget()
 end
