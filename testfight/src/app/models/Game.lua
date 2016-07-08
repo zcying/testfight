@@ -7,65 +7,83 @@ local CardBase=import('.CardBase')
 local Battle=import('.Battle')
 local scheduler = require("framework.scheduler")  
 
+local map={
 --兵阵初始点位
---local MYHEADPOS=cc.p(200,100)
---local MYMIDPOS=cc.p(300,160)
---local MYFRONTPOS=cc.p(400,220)
-local MYHEADPOS=cc.p(300,160)
-local MYMIDPOS=cc.p(400,220)
-local MYFRONTPOS=cc.p(500,280)
-local ENEHEADPOS=cc.p(900,520)
-local ENEMIDPOS=cc.p(800,460)
-local ENEFRONTPOS=cc.p(700,400)
-
+-- MYHEADPOS=cc.p(200,100)
+-- MYMIDPOS=cc.p(300,160)
+-- MYFRONTPOS=cc.p(400,220)
+ MYHEADPOS=cc.p(300,160),
+ MYMIDPOS=cc.p(400,220),
+ MYFRONTPOS=cc.p(500,280),
+ ENEHEADPOS=cc.p(900,520),
+ ENEMIDPOS=cc.p(800,460),
+ ENEFRONTPOS=cc.p(700,400),
 --我方近战战斗点位
---local MYCLOSEMIDPOS=cc.p(500,280)
---local MYCLOSELEFTPOS=cc.p(290,343)
---local MYCLOSEHALFLEFTPOS=cc.p(380,316)
---local MYCLOSERIGHTPOS=cc.p(710,217)
---local MYCLOSEHALFRIGHTPOS=cc.p(620,244)
-local MYCLOSEMIDPOS=cc.p(600,340)
-local MYCLOSELEFTPOS=cc.p(390,403)
-local MYCLOSEHALFLEFTPOS=cc.p(480,376)
-local MYCLOSERIGHTPOS=cc.p(810,277)
-local MYCLOSEHALFRIGHTPOS=cc.p(720,304)
-
+-- MYCLOSEMIDPOS=cc.p(500,280)
+-- MYCLOSELEFTPOS=cc.p(290,343)
+-- MYCLOSEHALFLEFTPOS=cc.p(380,316)
+-- MYCLOSERIGHTPOS=cc.p(710,217)
+-- MYCLOSEHALFRIGHTPOS=cc.p(620,244)
+ MYCLOSEMIDPOS=cc.p(600,340),
+ MYCLOSELEFTPOS=cc.p(390,403),
+ MYCLOSEHALFLEFTPOS=cc.p(480,376),
+ MYCLOSERIGHTPOS=cc.p(810,277),
+ MYCLOSEHALFRIGHTPOS=cc.p(720,304),
 --敌方近战战斗点位
-local ENECLOSEMIDPOS=cc.p(600,340)
-local ENECLOSELEFTPOS=cc.p(390,403)
-local ENECLOSEHALFLEFTPOS=cc.p(480,376)
-local ENECLOSERIGHTPOS=cc.p(810,277)
-local ENECLOSEHALFRIGHTPOS=cc.p(720,304)
-
+ ENECLOSEMIDPOS=cc.p(600,340),
+ ENECLOSELEFTPOS=cc.p(390,403),
+ ENECLOSEHALFLEFTPOS=cc.p(480,376),
+ ENECLOSERIGHTPOS=cc.p(810,277),
+ ENECLOSEHALFRIGHTPOS=cc.p(720,304),
 --我方远程战斗点位
-local MYLONGMIDPOS=MYFRONTPOS
---local MYLONGLEFTPOS=cc.p(190,283)
---local MYLONGHALFLEFTPOS=cc.p(280,256)
---local MYLONGRIGHTPOS=cc.p(610,157)
---local MYLONGHALFRIGHTPOS=cc.p(520,184)
-local MYLONGLEFTPOS=cc.p(290,343)
-local MYLONGHALFLEFTPOS=cc.p(380,316)
-local MYLONGRIGHTPOS=cc.p(710,217)
-local MYLONGHALFRIGHTPOS=cc.p(620,244)
-
+ MYLONGMIDPOS=cc.p(500,280),
+-- MYLONGLEFTPOS=cc.p(190,283)
+-- MYLONGHALFLEFTPOS=cc.p(280,256)
+-- MYLONGRIGHTPOS=cc.p(610,157)
+-- MYLONGHALFRIGHTPOS=cc.p(520,184)
+ MYLONGLEFTPOS=cc.p(290,343),
+ MYLONGHALFLEFTPOS=cc.p(380,316),
+ MYLONGRIGHTPOS=cc.p(710,217),
+ MYLONGHALFRIGHTPOS=cc.p(620,244),
 --敌方远程战斗点位
-local ENELONGMIDPOS=ENEFRONTPOS
-local ENELONGLEFTPOS=cc.p(490,463)
-local ENELONGHALFLEFTPOS=cc.p(580,436)
-local ENELONGRIGHTPOS=cc.p(910,339)
-local ENELONGHALFRIGHTPOS=cc.p(820,364)
-
+ ENELONGMIDPOS=cc.p(700,400),
+ ENELONGLEFTPOS=cc.p(490,463),
+ ENELONGHALFLEFTPOS=cc.p(580,436),
+ ENELONGRIGHTPOS=cc.p(910,339),
+ ENELONGHALFRIGHTPOS=cc.p(820,364),
 --卡牌点位
-local MYHEADCARDPOS=cc.p(50,display.height-50)
-local MYMIDCARDPOS=cc.p(140,display.height-50)
-local MYFRONTCARDPOS=cc.p(230,display.height-50)
-local ENEHEADCARDPOS=cc.p(display.width-50,50)
-local ENEMIDCARDPOS=cc.p(display.width-140,50)
-local ENEFRONTCARDPOS=cc.p(display.width-230,50)
+ MYHEADCARDPOS=cc.p(50,display.height-50),
+ MYMIDCARDPOS=cc.p(140,display.height-50),
+ MYFRONTCARDPOS=cc.p(230,display.height-50),
+ ENEHEADCARDPOS=cc.p(display.width-50,50),
+ ENEMIDCARDPOS=cc.p(display.width-140,50),
+ ENEFRONTCARDPOS=cc.p(display.width-230,50)
+}
 
 function Game:ctor()
     math.randomseed(os.time())
     self.cardkey={'myhead','mymid','myfront','enehead','enemid','enefront'}
+--格子分布，my/ene_close同一排
+--ENELONG      11   12   13 14    15
+--MY/ENECLOSE  6    7    8   9    10
+--MYLONG       1    2    3   4    5  
+--           LEFT HALFL MID HALFR RIGHT   
+    self.mapkey={{pos=map.MYLONGLEFTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.MYLONGHALFLEFTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.MYLONGMIDPOS,cardmy=nil,cardene=nil},
+                 {pos=map.MYLONGHALFRIGHTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.MYLONGRIGHTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.MYCLOSELEFTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.MYCLOSEHALFLEFTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.MYCLOSEMIDPOS,cardmy=nil,cardene=nil},
+                 {pos=map.MYCLOSEHALFRIGHTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.MYCLOSERIGHTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.ENELONGLEFTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.ENELONGHALFLEFTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.ENELONGMIDPOS,cardmy=nil,cardene=nil},
+                 {pos=map.ENELONGHALFRIGHTPOS,cardmy=nil,cardene=nil},
+                 {pos=map.ENELONGLEFTPOS,cardmy=nil,cardene=nil}
+                }
     self.background=display.newSprite('background.jpg')
         :pos(display.cx,display.cy)
         :addTo(self)
@@ -73,7 +91,6 @@ function Game:ctor()
     self.report=self.battle:getReport()
     self:initCardsPara()
     self:initSoldersAndCards()
-    --self:toRect()
     scheduler.performWithDelayGlobal(
         function()
             self:toRect()
@@ -112,18 +129,18 @@ function Game:initCardsPara()--从battle获取card的初始参数
 end
 
 function Game:initSoldersAndCards()--初始化card和solders
-    self:addSoldersOnCard(self.myhead,MYHEADPOS,MYHEADCARDPOS)
-    self:addSoldersOnCard(self.mymid,MYMIDPOS,MYMIDCARDPOS)
-    self:addSoldersOnCard(self.myfront,MYFRONTPOS,MYFRONTCARDPOS)
-    self:addSoldersOnCard(self.enehead,ENEHEADPOS,ENEHEADCARDPOS)
-    self:addSoldersOnCard(self.enemid,ENEMIDPOS,ENEMIDCARDPOS)
-    self:addSoldersOnCard(self.enefront,ENEFRONTPOS,ENEFRONTCARDPOS)
+    self:addSoldersOnCard(self.myhead,map.MYHEADPOS,map.MYHEADCARDPOS)
+    self:addSoldersOnCard(self.mymid,map.MYMIDPOS,map.MYMIDCARDPOS)
+    self:addSoldersOnCard(self.myfront,map.MYFRONTPOS,map.MYFRONTCARDPOS)
+    self:addSoldersOnCard(self.enehead,map.ENEHEADPOS,map.ENEHEADCARDPOS)
+    self:addSoldersOnCard(self.enemid,map.ENEMIDPOS,map.ENEMIDCARDPOS)
+    self:addSoldersOnCard(self.enefront,map.ENEFRONTPOS,map.ENEFRONTCARDPOS)
 end
 
 --根据卡牌类别添加兵阵
 --卡牌血量：兵量：阵型 
 --卡牌类型：兵种：速度、攻击距离等
---soc:solders on card,a table including cardparameter,solders and card
+--soc:solders on card,a table including cardparameter,solders,card and mapkey
 function Game:addSoldersOnCard(soc,solderpos,cardpos)
     if soc.cardpara==nil then return end
     local myorene=soc.myorene
@@ -177,6 +194,11 @@ function Game:toRect()
 end
 
 --到初始站位
+--格子分布，my/ene_close同一排
+--ENELONG      11   12   13 14    15
+--MY/ENECLOSE  6    7    8   9    10
+--MYLONG       1    2    3   4    5  
+--           LEFT HALFL MID HALFR RIGHT  
 function Game:getReady()
     local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy,mf,mm,mh,ef,em,eh--6个初始移动距离
     local mf=self.myfront.card:getType()--获取六个卡的兵种类型
@@ -185,72 +207,168 @@ function Game:getReady()
     local ef=self.enefront.card:getType()
     local em=self.enemid.card:getType()
     local eh=self.enehead.card:getType()
---近战/远程两种兵，大营/中军/前锋三个初始位置，敌/我，2^3*2，16种初始站位
+--近战/远程两种兵，大营/中军/前锋三个初始位置，敌/我，2^3*2，16种初始站位,如果一方卡量少于3张还没考虑
     if mf==2 and mm==2 and mh==2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGMIDPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYLONGRIGHTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYLONGLEFTPOS)
+        mfx,mfy=self:getDis(map.MYFRONTPOS,map.MYLONGMIDPOS)
+        self.myfront.mapkey=3
+        self.mapkey[3].cardmy='myfront'
+        mmx,mmy=self:getDis(map.MYMIDPOS,map.MYLONGRIGHTPOS)
+        self.mymid.mapkey=5
+        self.mapkey[5].cardmy='mymid'
+        mhx,mhy=self:getDis(map.MYHEADPOS,map.MYLONGLEFTPOS)
+        self.myhead.mapkey=1
+        self.mapkey[1].cardmy='myhead'
     elseif mf==2 and mm~=2 and mh==2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGHALFRIGHTPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEMIDPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYLONGHALFLEFTPOS)
+        mfx,mfy=self:getDis(map.MYFRONTPOS,map.MYLONGHALFRIGHTPOS)
+        self.myfront.mapkey=4
+        self.mapkey[4].cardmy='myfront'
+        mmx,mmy=self:getDis(map.MYMIDPOS,map.MYCLOSEMIDPOS)
+        self.mymid.mapkey=8
+        self.mapkey[8].cardmy='mymid'
+        mhx,mhy=self:getDis(map.MYHEADPOS,map.MYLONGHALFLEFTPOS)
+        self.myhead.mapkey=2
+        self.mapkey[2].cardmy='myhead'
     elseif mf==2 and mm==2 and mh~=2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGHALFRIGHTPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYLONGHALFLEFTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEMIDPOS)
+        mfx,mfy=self:getDis(map.MYFRONTPOS,map.MYLONGHALFRIGHTPOS)
+        self.myfront.mapkey=4
+        self.mapkey[4].cardmy='myfront'
+        mmx,mmy=self:getDis(map.MYMIDPOS,map.MYLONGHALFLEFTPOS)
+        self.mymid.mapkey=2
+        self.mapkey[2].cardmy='mymid'
+        mhx,mhy=self:getDis(map.MYHEADPOS,map.MYCLOSEMIDPOS)
+        self.myhead.mapkey=8
+        self.mapkey[8].cardmy='myhead'
     elseif mf==2 and mm~=2 and mh~=2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYLONGMIDPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEHALFRIGHTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEHALFLEFTPOS)
+        mfx,mfy=self:getDis(map.MYFRONTPOS,map.MYLONGMIDPOS)
+        self.myfront.mapkey=3
+        self.mapkey[3].cardmy='myfront'
+        mmx,mmy=self:getDis(map.MYMIDPOS,map.MYCLOSEHALFRIGHTPOS)
+        self.mymid.mapkey=9
+        self.mapkey[9].cardmy='mymid'
+        mhx,mhy=self:getDis(map.MYHEADPOS,map.MYCLOSEHALFLEFTPOS)
+        self.myhead.mapkey=7
+        self.mapkey[7].cardmy='myhead'
     elseif mf~=2 and mm==2 and mh==2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEMIDPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYLONGHALFRIGHTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYLONGHALFLEFTPOS)
+        mfx,mfy=self:getDis(map.MYFRONTPOS,map.MYCLOSEMIDPOS)
+        self.myfront.mapkey=8
+        self.mapkey[8].cardmy='myfront'
+        mmx,mmy=self:getDis(map.MYMIDPOS,map.MYLONGHALFRIGHTPOS)
+        self.mymid.mapkey=4
+        self.mapkey[4].cardmy='mymid'
+        mhx,mhy=self:getDis(map.MYHEADPOS,map.MYLONGHALFLEFTPOS)
+        self.myhead.mapkey=2
+        self.mapkey[2].cardmy='myhead'
     elseif mf~=2 and mm~=2 and mh==2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEHALFRIGHTPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSEHALFLEFTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYLONGMIDPOS)
+        mfx,mfy=self:getDis(map.MYFRONTPOS,map.MYCLOSEHALFRIGHTPOS)
+        self.myfront.mapkey=9
+        self.mapkey[9].cardmy='myfront'
+        mmx,mmy=self:getDis(map.MYMIDPOS,map.MYCLOSEHALFLEFTPOS)
+        self.mymid.mapkey=7
+        self.mapkey[7].cardmy='mymid'
+        mhx,mhy=self:getDis(map.MYHEADPOS,map.MYLONGMIDPOS)
+        self.myhead.mapkey=3
+        self.mapkey[3].cardmy='myhead'
     elseif mf~=2 and mm==2 and mh~=2 then
-        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEHALFRIGHTPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYLONGMIDPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSEHALFLEFTPOS)
+        mfx,mfy=self:getDis(map.MYFRONTPOS,map.MYCLOSEHALFRIGHTPOS)
+        self.myfront.mapkey=9
+        self.mapkey[9].cardmy='myfront'
+        mmx,mmy=self:getDis(map.MYMIDPOS,map.MYLONGMIDPOS)
+        self.mymid.mapkey=3
+        self.mapkey[3].cardmy='mymid'
+        mhx,mhy=self:getDis(map.MYHEADPOS,map.MYCLOSEHALFLEFTPOS)
+        self.myhead.mapkey=7
+        self.mapkey[7].cardmy='myhead'
     else
-        mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEMIDPOS)
-        mmx,mmy=self:getDis(MYMIDPOS,MYCLOSERIGHTPOS)
-        mhx,mhy=self:getDis(MYHEADPOS,MYCLOSELEFTPOS)
+        mfx,mfy=self:getDis(map.MYFRONTPOS,map.MYCLOSEMIDPOS)
+        self.myfront.mapkey=8
+        self.mapkey[8].cardmy='myfront'
+        mmx,mmy=self:getDis(map.MYMIDPOS,map.MYCLOSERIGHTPOS)
+        self.mymid.mapkey=10
+        self.mapkey[10].cardmy='mymid'
+        mhx,mhy=self:getDis(map.MYHEADPOS,map.MYCLOSELEFTPOS)
+        self.myhead.mapkey=6
+        self.mapkey[6].cardmy='myhead'
     end
     if eh==2 and em==2 and ef==2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGRIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENELONGLEFTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENELONGMIDPOS)
+        ehx,ehy=self:getDis(map.ENEHEADPOS,map.ENELONGRIGHTPOS)
+        self.enehead.mapkey=15
+        self.mapkey[15].cardene='enehead'
+        emx,emy=self:getDis(map.ENEMIDPOS,map.ENELONGLEFTPOS)
+        self.enemid.mapkey=11
+        self.mapkey[11].cardene='enemid'
+        efx,efy=self:getDis(map.ENEFRONTPOS,map.ENELONGMIDPOS)
+        self.enefront.mapkey=13
+        self.mapkey[13].cardene='enefront'
     elseif eh==2 and em~=2 and ef==2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGHALFRIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEMIDPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENELONGHALFLEFTPOS)
+        ehx,ehy=self:getDis(map.ENEHEADPOS,map.ENELONGHALFRIGHTPOS)
+        self.enehead.mapkey=14
+        self.mapkey[14].cardene='enehead'        
+        emx,emy=self:getDis(map.ENEMIDPOS,map.ENECLOSEMIDPOS)
+        self.enemid.mapkey=8
+        self.mapkey[8].cardene='enemid'        
+        efx,efy=self:getDis(map.ENEFRONTPOS,map.ENELONGHALFLEFTPOS)
+        self.enefront.mapkey=12
+        self.mapkey[12].cardene='enefront'    
     elseif eh==2 and em==2 and ef~=2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGHALFRIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENELONGHALFLEFTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEMIDPOS)
+        ehx,ehy=self:getDis(map.ENEHEADPOS,map.ENELONGHALFRIGHTPOS)
+        self.enehead.mapkey=14
+        self.mapkey[14].cardene='enehead'        
+        emx,emy=self:getDis(map.ENEMIDPOS,map.ENELONGHALFLEFTPOS)
+        self.enemid.mapkey=12
+        self.mapkey[12].cardene='enemid'      
+        efx,efy=self:getDis(map.ENEFRONTPOS,map.ENECLOSEMIDPOS)
+        self.enefront.mapkey=8
+        self.mapkey[8].cardene='enefront'    
     elseif eh==2 and em~=2 and ef~=2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENELONGMIDPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEHALFRIGHTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEHALFLEFTPOS)
+        ehx,ehy=self:getDis(map.ENEHEADPOS,map.ENELONGMIDPOS)
+        self.enehead.mapkey=13
+        self.mapkey[13].cardene='enehead'   
+        emx,emy=self:getDis(map.ENEMIDPOS,map.ENECLOSEHALFRIGHTPOS)
+        self.enemid.mapkey=9
+        self.mapkey[9].cardene='enemid'      
+        efx,efy=self:getDis(map.ENEFRONTPOS,map.ENECLOSEHALFLEFTPOS)
+        self.enefront.mapkey=7
+        self.mapkey[7].cardene='enefront'     
     elseif eh~=2 and em==2 and ef==2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEMIDPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENELONGHALFRIGHTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENELONGHALFLEFTPOS)
+        ehx,ehy=self:getDis(map.ENEHEADPOS,map.ENECLOSEMIDPOS)
+        self.enehead.mapkey=8
+        self.mapkey[8].cardene='enehead'      
+        emx,emy=self:getDis(map.ENEMIDPOS,map.ENELONGHALFRIGHTPOS)
+        self.enemid.mapkey=14
+        self.mapkey[14].cardene='enemid'     
+        efx,efy=self:getDis(map.ENEFRONTPOS,map.ENELONGHALFLEFTPOS)
+        self.enefront.mapkey=12
+        self.mapkey[12].cardene='enefront'   
     elseif eh~=2 and em~=2 and ef==2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEHALFRIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENECLOSEHALFLEFTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENELONGMIDPOS)
+        ehx,ehy=self:getDis(map.ENEHEADPOS,map.ENECLOSEHALFRIGHTPOS)
+        self.enehead.mapkey=9
+        self.mapkey[9].cardene='enehead'     
+        emx,emy=self:getDis(map.ENEMIDPOS,map.ENECLOSEHALFLEFTPOS)
+        self.enemid.mapkey=7
+        self.mapkey[7].cardene='enemid'    
+        efx,efy=self:getDis(map.ENEFRONTPOS,map.ENELONGMIDPOS)
+        self.enefront.mapkey=13
+        self.mapkey[13].cardene='enefront'    
     elseif eh~=2 and em==2 and ef~=2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSEHALFRIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENELONGMIDPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEHALFLEFTPOS)
-    elseif eh~=2 and em~=2 and ef~=2 then
-        ehx,ehy=self:getDis(ENEHEADPOS,ENECLOSERIGHTPOS)
-        emx,emy=self:getDis(ENEMIDPOS,ENECLOSELEFTPOS)
-        efx,efy=self:getDis(ENEFRONTPOS,ENECLOSEMIDPOS)
+        ehx,ehy=self:getDis(map.ENEHEADPOS,map.ENECLOSEHALFRIGHTPOS)
+        self.enehead.mapkey=9
+        self.mapkey[9].cardene='enehead'     
+        emx,emy=self:getDis(map.ENEMIDPOS,map.ENELONGMIDPOS)
+        self.enemid.mapkey=13
+        self.mapkey[13].cardene='enemid'     
+        efx,efy=self:getDis(map.ENEFRONTPOS,map.ENECLOSEHALFLEFTPOS)
+        self.enefront.mapkey=7
+        self.mapkey[7].cardene='enefront'     
+    else
+        ehx,ehy=self:getDis(map.ENEHEADPOS,map.ENECLOSERIGHTPOS)
+        self.enehead.mapkey=10
+        self.mapkey[10].cardene='enehead'    
+        emx,emy=self:getDis(map.ENEMIDPOS,map.ENECLOSELEFTPOS)
+        self.enemid.mapkey=6
+        self.mapkey[6].cardene='enemid'       
+        efx,efy=self:getDis(map.ENEFRONTPOS,map.ENECLOSEMIDPOS)
+        self.enefront.mapkey=8
+        self.mapkey[8].cardene='enefront'     
     end
     self.myfront.solders:moveForward(mfx,mfy)
     self.mymid.solders:moveForward(mmx,mmy)
@@ -263,7 +381,7 @@ end
 
 --解析战斗过程
 function Game:getBattle()
-    local torecttime=0
+    local torecttime=0--死方阵计数
     local action={} 
     local roundlabel=cc.ui.UILabel.new({
         text='round0',
@@ -271,8 +389,12 @@ function Game:getBattle()
         x=display.cx,
         y=display.height-50
     }):align(display.CENTER):addTo(self)
+    for n,m in pairs(self.cardkey) do--全部暗
+        self[m].card:endAttacked()
+        self[m].solders:endAttacked()
+    end
     for i=1,8 do --8回合
-        local round=self.report['round'..i]
+        local round=self.report['round'..i]--显示回合数
         if round==nil then
             break 
         end
@@ -281,45 +403,35 @@ function Game:getBattle()
             if attack==nil then break end
             for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
                 if  attack['atktype'..l]==nil then break end
-                action[#action+1]=transition.sequence({
---                    cc.DelayTime:create(2.8),--每张牌单次攻击时间间隔
+                action[#action+1]=transition.sequence({--保存动作
                     cc.CallFunc:create(function()
                         roundlabel:setString('round'..i)
-                        self[attack.atkfrom].card:attack()--攻击卡牌显示
-                        for n,m in pairs(self.cardkey) do
-                            if m~=attack.atkfrom then   
-                                self[m].card:setOpacity(150)--不攻击的暗
-                                self[m].solders:setOpacity(150)
-                            end 
-                        end
-                        self[attack.atkfrom].solders:showAttacking()--兵阵显示攻击状态
+                        self[attack.atkfrom].card:showAttacking()--显示攻击
+                        self[attack.atkfrom].solders:showAttacking()
                         --printLog(attack.atkfrom,self[attack.atkfrom].solders:getPortPos().x..','..self[attack.atkfrom].solders:getPortPos().y)
-                        for k,v in pairs(attack['atkto'..l])do --可攻击到敌我所有人，对己方的加血也算
+                        for k,v in pairs(attack['atkto'..l])do --攻击目标，可攻击到敌我所有人，对己方的加血也算
                             local beforhp=self[k].card:getHp()
-                            if v<0 then
-                                self[k].solders:showAttacked()--被攻击的亮
-                                self[k].card:setOpacity(255)
-                                self[k].solders:setOpacity(255)
-                            end
-                            scheduler.performWithDelayGlobal(
+                            local hpchange
+                            self[k].solders:showAttacked()--显示被攻击
+                            self[k].card:showAttacked(v)
+                            scheduler.performWithDelayGlobal(--结束攻击效果的定时器
                                 function()
                                     self[k].card:setHp(v,1)--扣血
                                     local afterhp=self[k].card:getHp()
                                     if v<0 then
                                         self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--被攻击死
+
                                     else
                                         self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
+
                                     end
-                                    self[attack.atkfrom].card:back()--卡牌回位
+                                    self[attack.atkfrom].card:endAttacking ()--结束攻击
                                     self[attack.atkfrom].solders:endAttacking()
-                                    self[k].solders:endAttacked()
-                                    for n,m in pairs(self.cardkey)do--所有亮
-                                        self[m].card:setOpacity(255)
-                                        self[m].solders:setOpacity(255)
-                                    end
+                                    self[k].solders:endAttacked()--结束被攻击
+                                    self[k].card:endAttacked()
                                     if afterhp==0 and self[k].card:getState() then
                                         self[k].card:die()
-                                        torecttime=1
+                                        torecttime=torecttime+1
                                     end
                                 end,
                                 self[attack.atkfrom].solders:getAtktime()+0.8--攻击效果显示时间
@@ -328,10 +440,11 @@ function Game:getBattle()
                     end
                 ),
                 cc.DelayTime:create(2), --每张牌单次攻击时间间隔     
-                cc.CallFunc:create(function()--没次攻击完如果有兵阵死光就是全部整队，并调整各阵位置
+                cc.CallFunc:create(function()--每次攻击完如果有兵阵死光就是全部整队，并调整各阵位置
                     for n,m in pairs(self.cardkey) do
-                        if self[m].card:getState()==nil and torecttime==1 then
-                        torecttime=0
+                        if self[m].card:getState()==nil and torecttime>0 then
+                            torecttime=torecttime-1
+                            self:moveSolders(m)
                             for o,p in pairs(self.cardkey)do 
                                 if self[p].card:getState() then
                                     self[p].solders:toRectandAtk()
@@ -345,6 +458,58 @@ function Game:getBattle()
         end
     end
     self:runAction(transition.sequence(action)) 
+end
+
+--有兵阵死光移动剩下的兵阵
+--diekey,死光的兵阵的cardkey：mymid\myfront\enehead...
+--self[diekey].mapkey,格子标号
+--格子分布，my/ene_close同一排
+--ENELONG      11   12   13 14    15
+--MY/ENECLOSE  6    7    8   9    10
+--MYLONG       1    2    3   4    5  
+--           LEFT HALFL MID HALFR RIGHT  
+function Game:moveSolders(diekey)
+    printLog(diekey,self[diekey].mapkey)
+    local mapkey=self[diekey].mapkey--1,2,3,4....15
+    local num=mapkey % 5
+    local movefrom={}--标号
+    local moveto={}
+    if num==1 then--left die，mid moveto halfleft,right moveto halfright
+        movefrom[1]=mapkey+2
+        moveto[1]=mapkey+1
+        movefrom[2]=mapkey+4
+        moveto[2]=mapkey+3
+    elseif num==2 then
+        movefrom[1]=mapkey+2
+        moveto[1]=mapkey+1       
+    elseif num==4 then
+        movefrom[1]=mapkey-2
+        moveto[1]=mapkey-1
+    elseif num==0 then
+        movefrom[1]=mapkey-4
+        moveto[1]=mapkey-3
+        movefrom[2]=mapkey-2
+        moveto[2]=mapkey-1
+    else--中间一个死，敌方近战整排向前移
+        if mapkey==8 then
+            if string.sub(diekey,1,1)=='m'then--myclosemid死，所有eneclose移动到mylong：1，2，3，4，5
+                for i=1,5 do
+                    movefrom[i]=i+5
+                    moveto[i]=i
+                end
+            else                              --eneclosemid死，所有myclose向前推到enelong：11，12，13，14，15
+                for i=1,5 do
+                    movefrom[i]=i+5
+                    moveto[i]=i+10
+                end
+            end
+        end
+    end
+    for i=1,#movefrom do
+        printLog('die',diekey)
+        printLog('movefrom'..i,movefrom[i])
+        printLog('moveto'..i,moveto[i])
+    end
 end
 
 function Game:getMyHeadpos()
@@ -381,21 +546,21 @@ function Game:showTest()
         :setTouchEnabled(true)
         :addNodeEventListener(cc.NODE_TOUCH_EVENT,
                               function(event)
---                                local mfx=MYCLOSEMIDPOS.x-MYFRONTPOS.x
---                                local mfy=MYCLOSEMIDPOS.y-MYFRONTPOS.y
-                                local mfx,mfy=self:getDis(MYFRONTPOS,MYCLOSEMIDPOS)
-                                local mmx=MYLONGHALFLEFTPOS.x-MYMIDPOS.x
-                                local mmy=MYLONGHALFLEFTPOS.y-MYMIDPOS.y
-                                local mhx=MYLONGHALFRIGHTPOS.x-MYHEADPOS.x
-                                local mhy=MYLONGHALFRIGHTPOS.y-MYHEADPOS.y
-                                local efx=ENECLOSEHALFLEFTPOS.x-ENEFRONTPOS.x
-                                local efy=ENECLOSEHALFLEFTPOS.y-ENEFRONTPOS.y
-                                local emx=ENECLOSEHALFRIGHTPOS.x-ENEMIDPOS.x
-                                local emy=ENECLOSEHALFRIGHTPOS.y-ENEMIDPOS.y
-                                local ehx=ENELONGMIDPOS.x-ENEHEADPOS.x
-                                local ehy=ENELONGMIDPOS.y-ENEHEADPOS.y
+--                                local mfx=map.MYCLOSEMIDPOS.x-map.MYFRONTPOS.x
+--                                local mfy=map.MYCLOSEMIDPOS.y-map.MYFRONTPOS.y
+                                local mfx,mfy=self:getDis(map.MYFRONTPOS,map.MYCLOSEMIDPOS)
+                                local mmx=map.MYLONGHALFLEFTPOS.x-map.MYMIDPOS.x
+                                local mmy=map.MYLONGHALFLEFTPOS.y-map.MYMIDPOS.y
+                                local mhx=map.MYLONGHALFRIGHTPOS.x-map.MYHEADPOS.x
+                                local mhy=map.MYLONGHALFRIGHTPOS.y-map.MYHEADPOS.y
+                                local efx=map.ENECLOSEHALFLEFTPOS.x-map.ENEFRONTPOS.x
+                                local efy=map.ENECLOSEHALFLEFTPOS.y-map.ENEFRONTPOS.y
+                                local emx=map.ENECLOSEHALFRIGHTPOS.x-map.ENEMIDPOS.x
+                                local emy=map.ENECLOSEHALFRIGHTPOS.y-map.ENEMIDPOS.y
+                                local ehx=map.ENELONGMIDPOS.x-map.ENEHEADPOS.x
+                                local ehy=map.ENELONGMIDPOS.y-map.ENEHEADPOS.y
                                 if event.name=='ended' then
-                                    --transition.moveTo(self.myhead.solders,{time=math.sqrt(mhx*mhx+mhy*mhy)/self.myhead.solders.speed,x=MYLONGHALFRIGHTPOS.x,y=MYLONGHALFRIGHTPOS.y})
+                                    --transition.moveTo(self.myhead.solders,{time=math.sqrt(mhx*mhx+mhy*mhy)/self.myhead.solders.speed,x=map.MYLONGHALFRIGHTPOS.x,y=map.MYLONGHALFRIGHTPOS.y})
                                     self.myhead.solders:moveForward(mhx,mhy)
                                     self.mymid.solders:moveForward(mmx,mmy)
                                     self.myfront.solders:moveForward(mfx,mfy)

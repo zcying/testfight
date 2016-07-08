@@ -146,24 +146,28 @@ function Solders:initSolders()
     self.portpos=self:convertToWorldSpace(cc.p(self.portrait:getPosition()))
 end
 
-function Solders:showAttacking()
+function Solders:showAttacking()--显示攻击
     self:portraitUp()
     self.attackingcircle:setVisible(true)
+    self:setOpacity(255)
 end
 
-function Solders:endAttacking()
+function Solders:endAttacking()--结束攻击
     self:portraitDown()
     self.attackingcircle:setVisible(false)
+    self:setOpacity(150)
 end
 
-function Solders:showAttacked()
+function Solders:showAttacked()--显示被攻击
     self:portraitUp()
     self.attackedcircle:setVisible(true)
+    self:setOpacity(255)
 end
 
-function Solders:endAttacked()
+function Solders:endAttacked()--结束被攻击
     self:portraitDown()
     self.attackedcircle:setVisible(false)
+    self:setOpacity(150)
 end
 
 --返回一次走路时间
@@ -313,8 +317,6 @@ function Solders:stop()
     end
 end
 
-
-
 --待命
 function Solders:steady()
     for _,k in pairs(self.solders) do
@@ -335,15 +337,6 @@ function Solders:attackForever()
         k:attackForever()
     end
 end
-
---function Solders:getAttack()
---    local actions={}
---    for _,k in pairs(self.solders)do
---        actions[#actions + 1] =transition.sequence({cc.Animate:create(k:getAttack()),cc.Animate:create(k:getSteady())})
---        transition.stopTarget(k)
---        k:runAction(actions[#actions])
---    end
---end
 
 --死兵，随机位置死
 function Solders:die(deadnum)
@@ -378,35 +371,6 @@ function Solders:die(deadnum)
     table.remove(self.solders,deadkeys[i])
     end
 end
-
-
---按实际数量像死一样跑
---function Solders:runawayAll(runnum)
---    if runnum<=0 then
---        return
---    end
---    self:getSoldernum()
---    if self.soldernum-runnum<=0 then
---        return
---    end
---    local runkeys=self:getDeadkey(runnum)
---    local sprite={}
---    for i=runnum,1,-1 do
---        local x,y=self.solders[runkeys[i]]:getPosition()
---        self:removeChild(self.solders[runkeys[i]])
---        sprite[i]=SolderHorse.new()
---                     :align(display.CENTER,x,y)
---                     :walk()
---        transition.moveBy(sprite[i],{time=65/sprite[i].getSpeed(),
---                                           x=-30,
---                                           y=-60,
---                                           onComplete=function()
---                                               sprite[i]:removeSelf()
---                                               table.remove(self.solders,runkeys[i])
---                                               --transition.fadeOut(self.solders[runkey],{time=1})
---                                           end})
---    end
---end
 
 --逃兵，逃最后两个意思一下，其余逃兵按死亡展现
 function Solders:runaway(num)
@@ -497,9 +461,5 @@ function Solders:getDeadkey(dienum)
     table.sort(deadkeys)
     return deadkeys
 end
-
---function Solders:getLeadPos()
---    return self.solders[1]:getPosition()
---end
 
 return Solders
