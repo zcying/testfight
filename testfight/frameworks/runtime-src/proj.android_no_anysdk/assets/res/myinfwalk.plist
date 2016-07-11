@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>frames</key>
+		<dict>
+			<key>myinfwalk01.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,0},{29,34}}</string>
+				<key>offset</key>
+				<string>{-4,1}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>myinfwalk02.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{29,0},{29,32}}</string>
+				<key>offset</key>
+				<string>{-4,1}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>myinfwalk03.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,131},{31,27}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<true />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>myinfwalk04.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,99},{32,27}}</string>
+				<key>offset</key>
+				<string>{2,0}</string>
+				<key>rotated</key>
+				<true />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>myinfwalk05.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,65},{34,27}}</string>
+				<key>offset</key>
+				<string>{1,0}</string>
+				<key>rotated</key>
+				<true />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>myinfwalk06.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,34},{31,30}}</string>
+				<key>offset</key>
+				<string>{-3,0}</string>
+				<key>rotated</key>
+				<true />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+		</dict>
+		<key>metadata</key>
+		<dict>
+			<key>format</key>
+			<integer>2</integer>
+			<key>textureFileName</key>
+			<string>myinfwalk.png</string>
+			<key>realTextureFileName</key>
+			<string>myinfwalk.png</string>
+			<key>size</key>
+			<string>{58,162}</string>
+		</dict>
+		<key>texture</key>
+		<dict>
+			<key>width</key>
+			<integer>58</integer>
+			<key>height</key>
+			<integer>162</integer>
+		</dict>
+	</dict>
+</plist>

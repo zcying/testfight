@@ -537,9 +537,9 @@ function Game:moveSolders(diekey)
                 self.mapkey[movefrom[i]]['card'..eneormy]=nil
 
 
-                printLog(diekey,self[diekey].mapkey)
-                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..eneormy]..'from'..movefrom[i])
-                printLog('moveto'..i,moveto[i])
+--                printLog(diekey,self[diekey].mapkey)
+--                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..eneormy]..'from'..movefrom[i])
+--                printLog('moveto'..i,moveto[i])
             end
         end             
     else
@@ -550,9 +550,9 @@ function Game:moveSolders(diekey)
                 self.mapkey[moveto[i]]['card'..myorene]=self.mapkey[movefrom[i]]['card'..myorene]
                 self.mapkey[movefrom[i]]['card'..myorene]=nil
 
-                printLog(diekey,self[diekey].mapkey)
-                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..myorene]..'from'..movefrom[i])
-                printLog('moveto'..i,moveto[i])
+--                printLog(diekey,self[diekey].mapkey)
+--                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..myorene]..'from'..movefrom[i])
+--                printLog('moveto'..i,moveto[i])
             end            
         end
     end

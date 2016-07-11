@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>frames</key>
+		<dict>
+			<key>enearcheratk01.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{24,82},{29,31}}</string>
+				<key>offset</key>
+				<string>{1,1}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearcheratk02.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{25,0},{24,37}}</string>
+				<key>offset</key>
+				<string>{-1,4}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearcheratk03.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,82},{24,41}}</string>
+				<key>offset</key>
+				<string>{-1,6}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearcheratk04.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,0},{25,41}}</string>
+				<key>offset</key>
+				<string>{-2,6}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearcheratk05.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,41},{25,41}}</string>
+				<key>offset</key>
+				<string>{-2,6}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearcheratk06.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,123},{28,33}}</string>
+				<key>offset</key>
+				<string>{-3,2}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+		</dict>
+		<key>metadata</key>
+		<dict>
+			<key>format</key>
+			<integer>2</integer>
+			<key>textureFileName</key>
+			<string>enearcheratk.png</string>
+			<key>realTextureFileName</key>
+			<string>enearcheratk.png</string>
+			<key>size</key>
+			<string>{53,156}</string>
+		</dict>
+		<key>texture</key>
+		<dict>
+			<key>width</key>
+			<integer>53</integer>
+			<key>height</key>
+			<integer>156</integer>
+		</dict>
+	</dict>
+</plist>

@@ -268,6 +268,8 @@
     <Content Include="testfight\res\eneinfsteady.png" />
     <Content Include="testfight\res\eneinfwalk.plist" />
     <Content Include="testfight\res\eneinfwalk.png" />
+    <Content Include="testfight\res\hpbar.png" />
+    <Content Include="testfight\res\hpbarbg.png" />
     <Content Include="testfight\res\myarcheratk.plist" />
     <Content Include="testfight\res\myarcheratk.png" />
     <Content Include="testfight\res\myarcherdie.png" />

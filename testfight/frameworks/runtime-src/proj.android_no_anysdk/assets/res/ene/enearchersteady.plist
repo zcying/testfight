@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>frames</key>
+		<dict>
+			<key>enearchersteady01.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,0},{31,29}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearchersteady02.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{31,0},{31,29}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearchersteady03.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{62,0},{31,29}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearchersteady04.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{93,0},{31,29}}</string>
+				<key>offset</key>
+				<string>{0,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearchersteady05.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{124,0},{30,29}}</string>
+				<key>offset</key>
+				<string>{1,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearchersteady06.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{154,0},{30,29}}</string>
+				<key>offset</key>
+				<string>{1,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>enearchersteady07.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{184,0},{30,29}}</string>
+				<key>offset</key>
+				<string>{1,0}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+		</dict>
+		<key>metadata</key>
+		<dict>
+			<key>format</key>
+			<integer>2</integer>
+			<key>textureFileName</key>
+			<string>enearchersteady.png</string>
+			<key>realTextureFileName</key>
+			<string>enearchersteady.png</string>
+			<key>size</key>
+			<string>{214,29}</string>
+		</dict>
+		<key>texture</key>
+		<dict>
+			<key>width</key>
+			<integer>214</integer>
+			<key>height</key>
+			<integer>29</integer>
+		</dict>
+	</dict>
+</plist>

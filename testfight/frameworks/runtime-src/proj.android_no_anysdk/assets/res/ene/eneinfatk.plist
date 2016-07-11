@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>frames</key>
+		<dict>
+			<key>eneinfatk01.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,0},{34,29}}</string>
+				<key>offset</key>
+				<string>{-2,-1}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>eneinfatk02.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{65,0},{22,39}}</string>
+				<key>offset</key>
+				<string>{-1,3}</string>
+				<key>rotated</key>
+				<true />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>eneinfatk03.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,29},{27,33}}</string>
+				<key>offset</key>
+				<string>{1,-1}</string>
+				<key>rotated</key>
+				<true />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>eneinfatk04.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{104,0},{25,30}}</string>
+				<key>offset</key>
+				<string>{-2,-12}</string>
+				<key>rotated</key>
+				<true />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>eneinfatk05.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{34,0},{31,30}}</string>
+				<key>offset</key>
+				<string>{-3,-5}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+		</dict>
+		<key>metadata</key>
+		<dict>
+			<key>format</key>
+			<integer>2</integer>
+			<key>textureFileName</key>
+			<string>eneinfatk.png</string>
+			<key>realTextureFileName</key>
+			<string>eneinfatk.png</string>
+			<key>size</key>
+			<string>{134,56}</string>
+		</dict>
+		<key>texture</key>
+		<dict>
+			<key>width</key>
+			<integer>134</integer>
+			<key>height</key>
+			<integer>56</integer>
+		</dict>
+	</dict>
+</plist>

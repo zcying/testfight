@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>frames</key>
+		<dict>
+			<key>eneinfwalk01.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{37,0},{35,30}}</string>
+				<key>offset</key>
+				<string>{0,-3}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>eneinfwalk02.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{107,0},{36,28}}</string>
+				<key>offset</key>
+				<string>{0,-2}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>eneinfwalk03.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{72,0},{35,29}}</string>
+				<key>offset</key>
+				<string>{-2,-2}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>eneinfwalk04.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{143,0},{34,29}}</string>
+				<key>offset</key>
+				<string>{-1,-2}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>eneinfwalk05.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,0},{37,29}}</string>
+				<key>offset</key>
+				<string>{-2,-2}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+			<key>eneinfwalk06.png</key>
+			<dict>
+				<key>frame</key>
+				<string>{{0,29},{36,29}}</string>
+				<key>offset</key>
+				<string>{0,-2}</string>
+				<key>rotated</key>
+				<false />
+				<key>sourceSize</key>
+				<string>{77,77}</string>
+			</dict>
+		</dict>
+		<key>metadata</key>
+		<dict>
+			<key>format</key>
+			<integer>2</integer>
+			<key>textureFileName</key>
+			<string>eneinfwalk.png</string>
+			<key>realTextureFileName</key>
+			<string>eneinfwalk.png</string>
+			<key>size</key>
+			<string>{177,58}</string>
+		</dict>
+		<key>texture</key>
+		<dict>
+			<key>width</key>
+			<integer>177</integer>
+			<key>height</key>
+			<integer>58</integer>
+		</dict>
+	</dict>
+</plist>

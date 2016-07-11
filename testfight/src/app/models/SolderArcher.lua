@@ -75,7 +75,7 @@ function SolderArcher:attackForever()
                                         cc.RotateBy:create(0.65,100)),
                         cc.CallFunc:create(function() 
                                 self.arrow:pos(40,40)
-                                          :setRotation(-60)
+                                          :setRotation(-70)
                         end)
                         )
     else
@@ -87,7 +87,7 @@ function SolderArcher:attackForever()
                                         cc.RotateBy:create(0.65,-100)),
                         cc.CallFunc:create(function() 
                                 self.arrow:pos(40,40)
-                                          :setRotation(30)
+                                          :setRotation(40)
                         end)
                         )
     end
@@ -99,11 +99,11 @@ function SolderArcher:getArrowPos()
     local p2,px,py
     if self.myorene=='my'then
         p2=cc.p(220,140)
-        px=40-math.random(0,80)
+        px=40-math.random(0,120)
         py=30-math.random(0,60)
     else
         p2=cc.p(-250,-160)
-        px=40-math.random(0,80)
+        px=40-math.random(0,120)
         py=30-math.random(0,60)
     end
     return cc.p(p2.x+px,p2.y+py)

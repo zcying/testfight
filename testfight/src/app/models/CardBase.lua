@@ -10,34 +10,55 @@ CardBase.SOLDER_TYPE_INFANTRY=3
 function CardBase:ctor(hp,cardname,myorene,typ)
     
     self.hp=hp
+    self.totalhp=hp
     self.typ=typ
     self.cardname=cardname
     --self.def=def
     --self.atk=atk
     self.myorene=myorene 
     self.hpchange=nil
+    self.hplabel=nil
+    self.hpbar=nil
+    self.hpbarbg=nil
     self.sprite=display.newSprite(self.cardname)
                                   :addTo(self)
-    self.hpposy=self.sprite:getPositionY()-10-self.sprite:getContentSize().height/2
-    if self.myorene=='ene'then 
-        self.hpposy=self.sprite:getPositionY()+10+self.sprite:getContentSize().height/2
-    end
-    self.hplabel=cc.ui.UILabel.new({text='hp'..self.hp,
-                                   x=self.sprite:getPositionX(),
-                                   y=self.hpposy,
-                                   size=16})
-                                 :align(display.CENTER)
-                                 :addTo(self)
+    self:initHp()
     self.sx=self.sprite:getPositionX()
     self.sy=self.sprite:getPositionY()
-    self.hx=self.hplabel:getPositionX()
-    self.hy=self.hplabel:getPositionY()
+
     self.status=1--»î
    --scheduler.scheduleGlobal(self.update,0.1)
 end
 
 function CardBase:getMyorEne()
     return self.myorene
+end
+
+function CardBase:initHp()
+    local hpposy=self.sprite:getPositionY()-10-self.sprite:getContentSize().height/2
+    if self.myorene=='ene'then 
+        hpposy=self.sprite:getPositionY()+10+self.sprite:getContentSize().height/2
+    end
+    self.hplabel=cc.ui.UILabel.new({text='hp'..self.hp,
+                                   x=self.sprite:getPositionX(),
+                                   y=hpposy,
+                                   font = 'Arial',
+                                   size=16})
+                                 :align(display.CENTER)
+    self.hx=self.hplabel:getPositionX()
+    self.hy=self.hplabel:getPositionY()
+    self.hpbar=display.newProgressTimer('hpbar.png',display.PROGRESS_TIMER_BAR)
+                                        :align(display.CENTER)
+                                        :pos(self.hx,self.hy)
+                                        :setBarChangeRate(cc.p(1,0))
+                                        :setMidpoint(cc.p(0,0.5))
+                                        :setPercentage(100)
+                                        :addTo(self)
+    self.hpbarbg=display.newSprite('hpbarbg.png')
+                                        :align(display.CENTER)
+                                        :pos(self.hx,self.hy) 
+                                        :addTo(self)                                   
+    self.hplabel:addTo(self)
 end
 
 function CardBase:die()
@@ -53,6 +74,8 @@ end
 function CardBase:setOpacity(op)--Í¸Ã÷¶È
     if self:getState() then
         self.sprite:setOpacity(op)
+        self.hpbar:setOpacity(op)
+        self.hpbarbg:setOpacity(op)
     end
 end
 
@@ -93,6 +116,8 @@ function CardBase:showAttacking()--ÏÔÊ¾¹¥»÷
     self.sprite:pos(sx,sy)
                :setScale(1.2)
     self.hplabel:pos(hx,hy)
+    self.hpbar:pos(hx,hy)
+    self.hpbarbg:pos(hx,hy)
 end
 
 function CardBase:endAttacking()--½áÊø¹¥»÷
@@ -100,6 +125,8 @@ function CardBase:endAttacking()--½áÊø¹¥»÷
     self.sprite:pos(self.sx,self.sy)
                :setScale(1)
     self.hplabel:pos(self.hx,self.hy)
+    self.hpbar:pos(self.hx,self.hy)
+    self.hpbarbg:pos(self.hx,self.hy)
 end
 
 function CardBase:getHp()
@@ -113,6 +140,7 @@ end
 function CardBase:setHp(hp,rate)
     self.hp=self.hp*rate+hp
     self.hplabel:setString('hp'..self.hp)
+    self.hpbar:setPercentage(self.hp/self.totalhp*100)
 end
 
 function CardBase:getType()
