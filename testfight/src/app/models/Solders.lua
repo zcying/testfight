@@ -30,6 +30,7 @@ function Solders:ctor(soldernum,myorene,typ,cardname)
     --self.originpos=nil
     self:initSoldersPos()--初始化点位
     self:initSolders()--初始化兵阵
+    self:initPortrait()--初始化小头像
 end
 
 function Solders:getSoldernum()
@@ -95,8 +96,6 @@ function Solders:initSoldersPos()
 
     --钳形
     self.pincer={}
-
-
 end
 
 --初始化兵阵，取得初始点位
@@ -134,16 +133,21 @@ function Solders:initSolders()
         local y=self.rectpos[i][2]
         self.solderspos[i]=cc.p(x,y)
     end
-    self.portrait=display.newSprite(self.cardname)
-                  :scale(0.4)
-                  :pos(0,20)
-                  :addTo(self)
-    --printLog(self.cardname)
     self.speed=self.solders[1]:getSpeed()
     self.walktime=self.solders[1].walktime
     self.atktime=self.solders[1].atktime
     self.steadytime=self.solders[1].steadytime
-    self.portpos=self:convertToWorldSpace(cc.p(self.portrait:getPosition()))
+end
+
+function Solders:initPortrait()
+    self.portrait=display.newSprite(self.cardname)
+                  :scale(0.4)
+                  :pos(-40,0)
+                  :addTo(self)
+    if self.myorene=='ene' then
+        self.portrait:pos(0,40)
+    end
+    self.portpos=self:convertToWorldSpace(cc.p(self.portrait:getPosition()))        
 end
 
 function Solders:showAttacking()--显示攻击

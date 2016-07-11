@@ -383,12 +383,11 @@ end
 function Game:getBattle()
     local torecttime=0--死方阵计数
     local action={} 
-    local roundlabel=cc.ui.UILabel.new({
-        text='round0',
+    local roundlabel=display.newTTFLabel({
+        text='ROUND1',
         size=50,
-        x=display.cx,
-        y=display.height-50
-    }):align(display.CENTER):addTo(self)
+        font = 'Arial'
+    }):align(display.CENTER):pos(display.cx,display.height-50):addTo(self)
     for n,m in pairs(self.cardkey) do--全部暗
         self[m].card:endAttacked()
         self[m].solders:endAttacked()
@@ -405,7 +404,7 @@ function Game:getBattle()
                 if  attack['atktype'..l]==nil then break end
                 action[#action+1]=transition.sequence({--保存动作
                     cc.CallFunc:create(function()
-                        roundlabel:setString('round'..i)
+                        roundlabel:setString('ROUND'..i)
                         self[attack.atkfrom].card:showAttacking()--显示攻击
                         self[attack.atkfrom].solders:showAttacking()
                         --printLog(attack.atkfrom,self[attack.atkfrom].solders:getPortPos().x..','..self[attack.atkfrom].solders:getPortPos().y)
@@ -420,10 +419,8 @@ function Game:getBattle()
                                     local afterhp=self[k].card:getHp()
                                     if v<0 then
                                         self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--被攻击死
-
                                     else
                                         self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
-
                                     end
                                     self[attack.atkfrom].card:endAttacking ()--结束攻击
                                     self[attack.atkfrom].solders:endAttacking()
@@ -441,18 +438,28 @@ function Game:getBattle()
                 ),
                 cc.DelayTime:create(2), --每张牌单次攻击时间间隔     
                 cc.CallFunc:create(function()--每次攻击完如果有兵阵死光就是全部整队，并调整各阵位置
-                    for n,m in pairs(self.cardkey) do
-                        if self[m].card:getState()==nil and torecttime>0 then
-                            torecttime=torecttime-1
-                            self:moveSolders(m)
-                            for o,p in pairs(self.cardkey)do 
-                                if self[p].card:getState() then
-                                    self[p].solders:toRectandAtk()
-                                end
+                    if self:whoWin() then--判断是否有一方死光
+                        roundlabel:setString(self:whoWin())
+                        for k,v in pairs(self.cardkey) do
+                            if self[v].card:getState() then
+                                self[v].solders:toRect()
                             end
                         end
-                    end                    
-                end)         
+                    else                    
+                        for n,m in pairs(self.cardkey) do
+                            if self[m].card:getState()==nil and torecttime>0 then
+                                torecttime=torecttime-1
+                                self:moveSolders(m)
+--                              for o,p in pairs(self.cardkey)do 
+--                                  if self[p].card:getState() then
+--                                      self[p].solders:toRectandAtk()
+--                                  end
+--                              end
+                            end
+                        end
+                    end            
+                end),
+                cc.DelayTime:create(0.5)         
                 })
             end
         end
@@ -469,11 +476,19 @@ end
 --MYLONG       1    2    3   4    5  
 --           LEFT HALFL MID HALFR RIGHT  
 function Game:moveSolders(diekey)
-    printLog(diekey,self[diekey].mapkey)
     local mapkey=self[diekey].mapkey--1,2,3,4....15
     local num=mapkey % 5
     local movefrom={}--标号
     local moveto={}
+    local myorene
+    local eneormy
+    if string.sub(diekey,1,1)=='m' then
+        myorene='my'
+        eneormy='ene'
+    else
+        myorene='ene'
+        eneormy='my'
+    end
     if num==1 then--left die，mid moveto halfleft,right moveto halfright
         movefrom[1]=mapkey+2
         moveto[1]=mapkey+1
@@ -490,25 +505,69 @@ function Game:moveSolders(diekey)
         moveto[1]=mapkey-3
         movefrom[2]=mapkey-2
         moveto[2]=mapkey-1
-    else--中间一个死，敌方近战整排向前移
-        if mapkey==8 then
-            if string.sub(diekey,1,1)=='m'then--myclosemid死，所有eneclose移动到mylong：1，2，3，4，5
-                for i=1,5 do
-                    movefrom[i]=i+5
-                    moveto[i]=i
-                end
-            else                              --eneclosemid死，所有myclose向前推到enelong：11，12，13，14，15
-                for i=1,5 do
-                    movefrom[i]=i+5
-                    moveto[i]=i+10
+    else--中间一个死，如果己方两边还有人，往中间移动，如果两边没有人，如果在远程位置没动作，如果在近程位置，敌方近战整排向前移
+        if self.mapkey[mapkey+2]['card'..myorene]~=nil then
+            movefrom[1]=mapkey+2
+            moveto[1]=mapkey+1
+            movefrom[2]=mapkey-2
+            moveto[2]=mapkey-1
+        else
+            if mapkey==8 then
+                if myorene=='my'then--myclosemid死，所有eneclose移动到mylong：1，2，3，4，5
+                    for i=1,5 do
+                        movefrom[i]=i+5
+                        moveto[i]=i
+                    end
+                else                              --eneclosemid死，所有myclose向前推到enelong：11，12，13，14，15
+                    for i=1,5 do
+                        movefrom[i]=i+5
+                        moveto[i]=i+10
+                    end
                 end
             end
         end
     end
-    for i=1,#movefrom do
-        printLog('die',diekey)
-        printLog('movefrom'..i,movefrom[i])
-        printLog('moveto'..i,moveto[i])
+
+    if  mapkey==8 and self.mapkey[mapkey+2]['card'..myorene]==nil then
+        for i=1,#movefrom do
+            if self.mapkey[movefrom[i]]['card'..eneormy]~=nil then
+                self[self.mapkey[movefrom[i]]['card'..eneormy]].mapkey=moveto[i]
+                self[self.mapkey[movefrom[i]]['card'..eneormy]].solders:moveForward(self:getDis(self.mapkey[movefrom[i]].pos,self.mapkey[moveto[i]].pos))
+                self.mapkey[moveto[i]]['card'..eneormy]=self.mapkey[movefrom[i]]['card'..eneormy]
+                self.mapkey[movefrom[i]]['card'..eneormy]=nil
+
+
+                printLog(diekey,self[diekey].mapkey)
+                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..eneormy]..'from'..movefrom[i])
+                printLog('moveto'..i,moveto[i])
+            end
+        end             
+    else
+        for i=1,#movefrom do 
+            if self.mapkey[movefrom[i]]['card'..myorene]~=nil then
+                self[self.mapkey[movefrom[i]]['card'..myorene]].mapkey=moveto[i]
+                self[self.mapkey[movefrom[i]]['card'..myorene]].solders:moveForward(self:getDis(self.mapkey[movefrom[i]].pos,self.mapkey[moveto[i]].pos))                
+                self.mapkey[moveto[i]]['card'..myorene]=self.mapkey[movefrom[i]]['card'..myorene]
+                self.mapkey[movefrom[i]]['card'..myorene]=nil
+
+                printLog(diekey,self[diekey].mapkey)
+                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..myorene]..'from'..movefrom[i])
+                printLog('moveto'..i,moveto[i])
+            end            
+        end
+    end
+end
+
+function Game:whoWin()
+    if self.mymid.card:getState()==nil and
+       self.myhead.card:getState()==nil and
+       self.myfront.card:getState()==nil then
+           return 'LOSE'
+    end
+    if self.enemid.card:getState()==nil and
+       self.enehead.card:getState()==nil and
+       self.enefront.card:getState()==nil  then
+           return 'WIN'
     end
 end
 

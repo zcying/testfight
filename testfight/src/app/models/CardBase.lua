@@ -32,7 +32,7 @@ function CardBase:ctor(hp,cardname,myorene,typ)
     self.sy=self.sprite:getPositionY()
     self.hx=self.hplabel:getPositionX()
     self.hy=self.hplabel:getPositionY()
-    self.status=1
+    self.status=1--ªÓ
    --scheduler.scheduleGlobal(self.update,0.1)
 end
 
@@ -41,7 +41,7 @@ function CardBase:getMyorEne()
 end
 
 function CardBase:die()
-    self.status=nil
+    self.status=nil--À¿
     self.hplabel:setString('dead')
     self.sprite=display.newSprite('die'..self.cardname):addTo(self)
 end
