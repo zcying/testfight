@@ -93,15 +93,19 @@ function Game:ctor()
     self:initSoldersAndCards()
     scheduler.performWithDelayGlobal(
         function()
-            self:toRect()
+            self:toRect()--场景开始0.2秒后楔形变成矩形
         end,0.2)
     scheduler.performWithDelayGlobal(
         function()
-            self:getReady()
+            self:getRound0()--场景开始1秒后进入round0
             scheduler.performWithDelayGlobal(
                 function()
-                    self:getBattle() 
-                end,1) 
+                    self:getReady()--round0开始1秒，场景开始2秒后，开始getready
+                    scheduler.performWithDelayGlobal(
+                        function()
+                            self:getBattle() --getready开始1.5秒后，场景开始3.5秒后，开始battle
+                        end,1.5)
+                end,5) 
         end,1)
     --self:showTest()
 end
@@ -376,7 +380,10 @@ function Game:getReady()
     self.enefront.solders:moveForward(efx,efy)
     self.enemid.solders:moveForward(emx,emy)
     self.enehead.solders:moveForward(ehx,ehy)
- 
+end
+
+function Game:getRound0()--准备阶段，加buff
+
 end
 
 --解析战斗过程
@@ -397,27 +404,31 @@ function Game:getBattle()
         if round==nil then
             break 
         end
-        for j=1,6 do --每回合两边各三张牌攻击，共6牌攻击
+        for j=1,100 do --每回合两边各三张牌攻击，共6牌攻击
             local attack=round['attack'..j]
             if attack==nil then break end
             for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
                 if  attack['atktype'..l]==nil then break end
+                local atktype=attack['atktype'..l]
                 action[#action+1]=transition.sequence({--保存动作
                     cc.CallFunc:create(function()
                         roundlabel:setString('ROUND'..i)
-                        self[attack.atkfrom].card:showAttacking()--显示攻击
-                        self[attack.atkfrom].solders:showAttacking()
+                        self[attack.atkfrom].card:showAttacking(atktype)--卡牌显示攻击
+                        self[attack.atkfrom].solders:showAttacking()--兵阵显示攻击
                         --printLog(attack.atkfrom,self[attack.atkfrom].solders:getPortPos().x..','..self[attack.atkfrom].solders:getPortPos().y)
                         for k,v in pairs(attack['atkto'..l])do --攻击目标，可攻击到敌我所有人，对己方的加血也算
                             local beforhp=self[k].card:getHp()
                             local hpchange
-                            self[k].solders:showAttacked()--显示被攻击
-                            self[k].card:showAttacked(v)
+                            if atktype=='normal' then
+                                self:showAttack(self.mapkey[self[attack.atkfrom].mapkey].pos,self.mapkey[self[k].mapkey].pos,k,atktype)--兵阵间攻击动画
+                            end
+                            self[k].solders:showAttacked(v)--兵阵显示被攻击
+                            self[k].card:showAttacked(v)--卡牌显示被攻击
                             scheduler.performWithDelayGlobal(--结束攻击效果的定时器
                                 function()
-                                    self[k].card:setHp(v,1)--扣血
+                                    self[k].card:setHp(v.hp,1)--扣血
                                     local afterhp=self[k].card:getHp()
-                                    if v<0 then
+                                    if v.hp~=nil and v.hp<0 then
                                         self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--被攻击死
                                     else
                                         self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
@@ -527,7 +538,6 @@ function Game:moveSolders(diekey)
             end
         end
     end
-
     if  mapkey==8 and self.mapkey[mapkey+2]['card'..myorene]==nil then
         for i=1,#movefrom do
             if self.mapkey[movefrom[i]]['card'..eneormy]~=nil then
@@ -535,8 +545,6 @@ function Game:moveSolders(diekey)
                 self[self.mapkey[movefrom[i]]['card'..eneormy]].solders:moveForward(self:getDis(self.mapkey[movefrom[i]].pos,self.mapkey[moveto[i]].pos))
                 self.mapkey[moveto[i]]['card'..eneormy]=self.mapkey[movefrom[i]]['card'..eneormy]
                 self.mapkey[movefrom[i]]['card'..eneormy]=nil
-
-
 --                printLog(diekey,self[diekey].mapkey)
 --                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..eneormy]..'from'..movefrom[i])
 --                printLog('moveto'..i,moveto[i])
@@ -558,17 +566,56 @@ function Game:moveSolders(diekey)
     end
 end
 
-function Game:whoWin()
+function Game:showAttack(posfrom,posto,k)--攻击特效
+    local aposfrom=posfrom
+    local aposto=posto
+    if aposfrom==aposto then
+        if string.sub(k,1,1)=='e' then
+            aposfrom=cc.p(aposfrom.x-40,aposfrom.y-20)
+            aposto=cc.p(aposto.x+40,aposto.y+20)
+        else
+            aposfrom=cc.p(aposfrom.x+40,aposfrom.y+20)
+            aposto=cc.p(aposto.x-40,aposto.y-20)
+        end
+    end
+    local attacksprite=display.newSprite('attack.png')
+                        :align(display.CENTER)
+                        :pos(aposfrom.x,aposfrom.y)
+                        :setRotation(-self:getAngle(aposfrom,aposto))
+                        :addTo(self)
+    if string.sub(k,1,1)=='m' then
+        attacksprite:setRotation(90-self:getAngle(aposfrom,aposto))
+    end
+    transition.moveTo(attacksprite,{x=aposto.x,
+                                    y=aposto.y,
+                                    time=0.5,
+                                    onComplete=function()
+                                        attacksprite:removeSelf()
+                                    end})
+end
+
+function Game:getAngle(posfrom,posto)
+    local l=posto.y-posfrom.y
+    local d=math.sqrt((posto.y-posfrom.y)*(posto.y-posfrom.y)+(posto.x-posfrom.x)*(posto.x-posfrom.x))
+    local lsin=l/d
+    return math.deg(math.asin(lsin))
+end
+
+function Game:whoWin()--判断赢
     if self.mymid.card:getState()==nil and
        self.myhead.card:getState()==nil and
        self.myfront.card:getState()==nil then
            return 'LOSE'
     end
-    if self.enemid.card:getState()==nil and
+    if 
+       self.enemid.card:getState()==nil and
        self.enehead.card:getState()==nil and
        self.enefront.card:getState()==nil  then
            return 'WIN'
     end
+--    else 
+--        return 'DRAW'
+--    end
 end
 
 function Game:getMyHeadpos()

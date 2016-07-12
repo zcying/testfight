@@ -234,6 +234,7 @@
     <Content Include="testfight\frameworks\runtime-src\proj.win32\res\game.ico" />
     <Content Include="testfight\frameworks\runtime-src\proj.win32\testfight.vcxproj" />
     <Content Include="testfight\frameworks\runtime-src\proj.win32\testfight.vcxproj.filters" />
+    <Content Include="testfight\res\attack.png" />
     <Content Include="testfight\res\attacked.png" />
     <Content Include="testfight\res\attacking.png" />
     <Content Include="testfight\res\background.jpg" />

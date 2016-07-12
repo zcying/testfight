@@ -147,7 +147,7 @@ function Solders:initPortrait()
     if self.myorene=='ene' then
         self.portrait:pos(0,40)
     end
-    self.portpos=self:convertToWorldSpace(cc.p(self.portrait:getPosition()))        
+    self.portpos=cc.p(self.portrait:getPosition())      
 end
 
 function Solders:showAttacking()--显示攻击
@@ -162,16 +162,50 @@ function Solders:endAttacking()--结束攻击
     self:setOpacity(150)
 end
 
-function Solders:showAttacked()--显示被攻击
+function Solders:showAttacked(v)--显示被攻击
     self:portraitUp()
     self.attackedcircle:setVisible(true)
     self:setOpacity(255)
+    local atk=v.atk
+    if atk then
+        local atklabel=cc.ui.UILabel.new({
+            x=self.portpos.x,
+            y=self.portpos.y,
+            font = 'Arial',
+            size=20
+        })
+            :align(display.CENTER)
+            :addTo(self)
+        if atk>=0 then
+            atklabel:setColor(cc.c3b(0,255,0)):setString('atk+'..atk)
+            transition.execute(atklabel,
+                               cc.MoveBy:create(1,cc.p(0,40)),
+                               {onComplete=function()
+                                   atklabel:removeSelf()
+                               end})
+        else
+            atklabel:setColor(cc.c3b(255,0,0)):setString('atk'..atk)
+            transition.execute(atklabel,
+                               cc.MoveBy:create(1,cc.p(0,-40)),
+                               {onComplete=function()
+                                   atklabel:removeSelf()
+                               end})
+        end
+    end
 end
 
 function Solders:endAttacked()--结束被攻击
     self:portraitDown()
     self.attackedcircle:setVisible(false)
     self:setOpacity(150)
+end
+
+function Solders:showBuff()
+
+end
+
+function Solders:endBuff()
+
 end
 
 --返回一次走路时间
@@ -292,7 +326,7 @@ function Solders:moveForward(px,py,posfrom,posto)
         end
         local ltime=math.sqrt(px*px+py*py)/self.speed
         transition.moveBy(self.portrait,{time=ltime,x=px,y=py,onComplete=function()
-                    self.portpos=self:convertToWorldSpace(cc.p(self.portrait:getPosition()))
+                    self.portpos=cc.p(self.portrait:getPosition())
                     --printLog('portraitpos',self.portpos.x..','..self.portpos.y)
         end})
         for _,k in pairs(self.solders) do--整体前进
@@ -310,6 +344,7 @@ function Solders:moveForward(px,py,posfrom,posto)
 end
 
 function Solders:getPortPos()
+    self.portpos=cc.p(self.portrait:getPosition())   
     return self.portpos
 end
 

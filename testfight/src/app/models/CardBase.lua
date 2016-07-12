@@ -79,21 +79,48 @@ function CardBase:setOpacity(op)--Í¸Ã÷¶È
     end
 end
 
-function CardBase:showAttacked(hpchange)--ÏÔÊ¾±»¹¥»÷
+function CardBase:showAttacked(v)--ÏÔÊ¾±»¹¥»÷
     self:setOpacity(255)
-    if hpchange<0 then 
-        self.hpchange=cc.ui.UILabel.new({text=hpchange,size=20,color=cc.c3b(255,0,0)})
-    elseif hpchange>=0 then
-        self.hpchange=cc.ui.UILabel.new({text='+'..hpchange,size=20,color=cc.c3b(0,255,0)})
-    else
-        return
+    local atk=v.atk
+    local hpchange=v.hp
+    if hpchange~=nil then
+        if hpchange<0 then 
+            self.hpchange=cc.ui.UILabel.new({text='hp'..hpchange,size=20,color=cc.c3b(255,0,0)})
+        else
+            self.hpchange=cc.ui.UILabel.new({text='hp+'..hpchange,size=20,color=cc.c3b(0,255,0)})
+        end
+        if self.myorene =='my'then
+            self.hpchange:pos(self.hx,self.sprite:getPositionY()-80)
+        else
+            self.hpchange:pos(self.hx,self.sprite:getPositionY()+80)
+        end 
+        self.hpchange:align(display.CENTER):addTo(self)
     end
-    if self.myorene =='my'then
-        self.hpchange:pos(self.hx,self.sprite:getPositionY()-80)
-    else
-        self.hpchange:pos(self.hx,self.sprite:getPositionY()+80)
-    end 
-    self.hpchange:align(display.CENTER):addTo(self)
+    if atk then
+        local atklabel=cc.ui.UILabel.new({
+            font = 'Arial',
+            size=18,
+            x=self.sx,
+            y=self.sy
+        })
+            :align(display.CENTER)
+            :addTo(self)
+        if atk>=0 then
+            atklabel:setColor(cc.c3b(0,255,0)):setString('atk+'..atk)
+            transition.execute(atklabel,
+                               cc.MoveBy:create(1,cc.p(0,40)),
+                               {onComplete=function()
+                                   atklabel:removeSelf()
+                               end})
+        else
+            atklabel:setColor(cc.c3b(255,0,0)):setString('atk'..atk)
+            transition.execute(atklabel,
+                               cc.MoveBy:create(1,cc.p(0,-40)),
+                               {onComplete=function()
+                                   atklabel:removeSelf()
+                               end})
+        end
+    end
 end
 
 function CardBase:endAttacked()--½áÊø±»¹¥»÷
@@ -103,7 +130,7 @@ function CardBase:endAttacked()--½áÊø±»¹¥»÷
     end
 end
 
-function CardBase:showAttacking()--ÏÔÊ¾¹¥»÷
+function CardBase:showAttacking(atktype)--ÏÔÊ¾¹¥»÷
     self:setOpacity(255)
     local sx=self.sprite:getPositionX()
     local hx=sx
@@ -118,6 +145,22 @@ function CardBase:showAttacking()--ÏÔÊ¾¹¥»÷
     self.hplabel:pos(hx,hy)
     self.hpbar:pos(hx,hy)
     self.hpbarbg:pos(hx,hy)
+    if atktype~='normal' then
+        local atklabel=cc.ui.UILabel.new({
+            text=atktype,
+            x=self.sprite:getPositionX(),
+            y=self.sprite:getPositionY(),
+            font = 'Arial',
+            size=16
+        })
+            :align(display.CENTER)
+            :addTo(self)
+        transition.execute(atklabel,
+                           cc.ScaleTo:create(1,1.5),
+                           {onComplete=function()
+                               atklabel:removeSelf()
+                           end})
+    end
 end
 
 function CardBase:endAttacking()--½áÊø¹¥»÷
@@ -138,9 +181,11 @@ function CardBase:getCardName()
 end
 
 function CardBase:setHp(hp,rate)
-    self.hp=self.hp*rate+hp
-    self.hplabel:setString('hp'..self.hp)
-    self.hpbar:setPercentage(self.hp/self.totalhp*100)
+    if hp then
+        self.hp=self.hp*rate+hp
+        self.hplabel:setString('hp'..self.hp)
+        self.hpbar:setPercentage(self.hp/self.totalhp*100)
+    end
 end
 
 function CardBase:getType()
