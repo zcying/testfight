@@ -120,7 +120,6 @@ bool AppDelegate::applicationDidFinishLaunching()
     // use discrete files
     engine->executeScriptFile("src/main.lua");
 #endif
-
     return true;
 }
 

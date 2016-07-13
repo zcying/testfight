@@ -63,6 +63,7 @@ local map={
 function Game:ctor()
     math.randomseed(os.time())
     self.cardkey={'myhead','mymid','myfront','enehead','enemid','enefront'}
+
 --格子分布，my/ene_close同一排
 --ENELONG      11   12   13 14    15
 --MY/ENECLOSE  6    7    8   9    10
@@ -105,7 +106,7 @@ function Game:ctor()
                         function()
                             self:getBattle() --getready开始1.5秒后，场景开始3.5秒后，开始battle
                         end,1.5)
-                end,5) 
+                end,1) 
         end,1)
     --self:showTest()
 end

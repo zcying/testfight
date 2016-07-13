@@ -8,7 +8,7 @@ local Battle=import('.Battle')
 local scheduler = require("framework.scheduler")  
 
 local map={
---兵阵初始点位
+--卤酶脮贸鲁玫脢录碌茫脦禄
 -- MYHEADPOS=cc.p(200,100)
 -- MYMIDPOS=cc.p(300,160)
 -- MYFRONTPOS=cc.p(400,220)
@@ -18,7 +18,7 @@ local map={
  ENEHEADPOS=cc.p(900,520),
  ENEMIDPOS=cc.p(800,460),
  ENEFRONTPOS=cc.p(700,400),
---我方近战战斗点位
+--脦脪路陆陆眉脮陆脮陆露路碌茫脦禄
 -- MYCLOSEMIDPOS=cc.p(500,280)
 -- MYCLOSELEFTPOS=cc.p(290,343)
 -- MYCLOSEHALFLEFTPOS=cc.p(380,316)
@@ -29,13 +29,13 @@ local map={
  MYCLOSEHALFLEFTPOS=cc.p(480,376),
  MYCLOSERIGHTPOS=cc.p(810,277),
  MYCLOSEHALFRIGHTPOS=cc.p(720,304),
---敌方近战战斗点位
+--碌脨路陆陆眉脮陆脮陆露路碌茫脦禄
  ENECLOSEMIDPOS=cc.p(600,340),
  ENECLOSELEFTPOS=cc.p(390,403),
  ENECLOSEHALFLEFTPOS=cc.p(480,376),
  ENECLOSERIGHTPOS=cc.p(810,277),
  ENECLOSEHALFRIGHTPOS=cc.p(720,304),
---我方远程战斗点位
+--脦脪路陆脭露鲁脤脮陆露路碌茫脦禄
  MYLONGMIDPOS=cc.p(500,280),
 -- MYLONGLEFTPOS=cc.p(190,283)
 -- MYLONGHALFLEFTPOS=cc.p(280,256)
@@ -45,13 +45,13 @@ local map={
  MYLONGHALFLEFTPOS=cc.p(380,316),
  MYLONGRIGHTPOS=cc.p(710,217),
  MYLONGHALFRIGHTPOS=cc.p(620,244),
---敌方远程战斗点位
+--碌脨路陆脭露鲁脤脮陆露路碌茫脦禄
  ENELONGMIDPOS=cc.p(700,400),
  ENELONGLEFTPOS=cc.p(490,463),
  ENELONGHALFLEFTPOS=cc.p(580,436),
  ENELONGRIGHTPOS=cc.p(910,339),
  ENELONGHALFRIGHTPOS=cc.p(820,364),
---卡牌点位
+--驴篓脜脝碌茫脦禄
  MYHEADCARDPOS=cc.p(50,display.height-50),
  MYMIDCARDPOS=cc.p(140,display.height-50),
  MYFRONTCARDPOS=cc.p(230,display.height-50),
@@ -63,7 +63,8 @@ local map={
 function Game:ctor()
     math.randomseed(os.time())
     self.cardkey={'myhead','mymid','myfront','enehead','enemid','enefront'}
---格子分布，my/ene_close同一排
+
+--赂帽脳脫路脰虏录拢卢my/ene_close脥卢脪禄脜脜
 --ENELONG      11   12   13 14    15
 --MY/ENECLOSE  6    7    8   9    10
 --MYLONG       1    2    3   4    5  
@@ -87,20 +88,35 @@ function Game:ctor()
     self.background=display.newSprite('background.jpg')
         :pos(display.cx,display.cy)
         :addTo(self)
+
+    --self.testjpg=display.newSprite('testjpg.jpg'):align(display.CENTER):pos(display.cx,display.cy):addTo(self)
+    --self.tes.tjpg2=cc.Sprite:create('testjpg.jpg'):align(display.CENTER):pos(display.cx+200,display.cy):addTo(self)
+    local str = cc.FileUtils:getInstance():fullPathForFilename('testjpg.jpg')
+        self.hplabel=cc.ui.UILabel.new({text="xxxxxx"..str,
+                                   x=display.cx,
+                                   y=50,
+                                   font = 'Arial',
+                                   size=16})
+                                 :align(display.CENTER)
+                                 :addTo(self)
     self.battle=Battle:new()
     self.report=self.battle:getReport()
     self:initCardsPara()
     self:initSoldersAndCards()
     scheduler.performWithDelayGlobal(
         function()
-            self:toRect()
+            self:toRect()--鲁隆戮掳驴陋脢录0.2脙毛潞贸脨篓脨脦卤盲鲁脡戮脴脨脦
         end,0.2)
     scheduler.performWithDelayGlobal(
         function()
-            self:getReady()
+            self:getRound0()--鲁隆戮掳驴陋脢录1脙毛潞贸陆酶脠毛round0
             scheduler.performWithDelayGlobal(
                 function()
-                    self:getBattle() 
+                    self:getReady()--round0驴陋脢录1脙毛拢卢鲁隆戮掳驴陋脢录2脙毛潞贸拢卢驴陋脢录getready
+                    scheduler.performWithDelayGlobal(
+                        function()
+                            self:getBattle() --getready驴陋脢录1.5脙毛潞贸拢卢鲁隆戮掳驴陋脢录3.5脙毛潞贸拢卢驴陋脢录battle
+                        end,1.5)
                 end,1) 
         end,1)
     --self:showTest()
@@ -110,7 +126,7 @@ function Game:onEnter()
     
 end
 
-function Game:initCardsPara()--从battle获取card的初始参数
+function Game:initCardsPara()--麓脫battle禄帽脠隆card碌脛鲁玫脢录虏脦脢媒
     for k,v in pairs(self.cardkey)do
         local myorene=string.sub(v,1,1)
         if myorene=='m' then 
@@ -120,15 +136,15 @@ function Game:initCardsPara()--从battle获取card的初始参数
         end
         self[v]={cardpara=self.battle:getCardbyKey(v),card,solders,myorene=myorene}
     end
---    self.myhead={cardpara=self.battle:getCardbyKey('myhead'),card,solders,myorene='my'}--我军大本营
---    self.mymid={cardpara=self.battle:getCardbyKey('mymid'),card,solders,myorene='my'}  --中军
---    self.myfront={cardpara=self.battle:getCardbyKey('myfront'),card,solders,myorene='my'}--前锋
---    self.enehead={cardpara=self.battle:getCardbyKey('enehead'),card,solders,myorene='ene'}--敌军
+--    self.myhead={cardpara=self.battle:getCardbyKey('myhead'),card,solders,myorene='my'}--脦脪戮眉麓贸卤戮脫陋
+--    self.mymid={cardpara=self.battle:getCardbyKey('mymid'),card,solders,myorene='my'}  --脰脨戮眉
+--    self.myfront={cardpara=self.battle:getCardbyKey('myfront'),card,solders,myorene='my'}--脟掳路忙
+--    self.enehead={cardpara=self.battle:getCardbyKey('enehead'),card,solders,myorene='ene'}--碌脨戮眉
 --    self.enemid={cardpara=self.battle:getCardbyKey('enemid'),card,solders,myorene='ene'}  
 --    self.enefront={cardpara=self.battle:getCardbyKey('enefront'),card,solders,myorene='ene'}
 end
 
-function Game:initSoldersAndCards()--初始化card和solders
+function Game:initSoldersAndCards()--鲁玫脢录禄炉card潞脥solders
     self:addSoldersOnCard(self.myhead,map.MYHEADPOS,map.MYHEADCARDPOS)
     self:addSoldersOnCard(self.mymid,map.MYMIDPOS,map.MYMIDCARDPOS)
     self:addSoldersOnCard(self.myfront,map.MYFRONTPOS,map.MYFRONTCARDPOS)
@@ -137,9 +153,9 @@ function Game:initSoldersAndCards()--初始化card和solders
     self:addSoldersOnCard(self.enefront,map.ENEFRONTPOS,map.ENEFRONTCARDPOS)
 end
 
---根据卡牌类别添加兵阵
---卡牌血量：兵量：阵型 
---卡牌类型：兵种：速度、攻击距离等
+--赂霉戮脻驴篓脜脝脌脿卤冒脤铆录脫卤酶脮贸
+--驴篓脜脝脩陋脕驴拢潞卤酶脕驴拢潞脮贸脨脥 
+--驴篓脜脝脌脿脨脥拢潞卤酶脰脰拢潞脣脵露脠隆垄鹿楼禄梅戮脿脌毛碌脠
 --soc:solders on card,a table including cardparameter,solders,card and mapkey
 function Game:addSoldersOnCard(soc,solderpos,cardpos)
     if soc.cardpara==nil then return end
@@ -180,7 +196,7 @@ function Game:getSolderNum(cardhp)
     end        
 end
 
---moveby距离
+--moveby戮脿脌毛
 function Game:getDis(posfrom,posto)
     return posto.x-posfrom.x, posto.y-posfrom.y
 end
@@ -193,21 +209,21 @@ function Game:toRect()
     end   
 end
 
---到初始站位
---格子分布，my/ene_close同一排
+--碌陆鲁玫脢录脮戮脦禄
+--赂帽脳脫路脰虏录拢卢my/ene_close脥卢脪禄脜脜
 --ENELONG      11   12   13 14    15
 --MY/ENECLOSE  6    7    8   9    10
 --MYLONG       1    2    3   4    5  
 --           LEFT HALFL MID HALFR RIGHT  
 function Game:getReady()
-    local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy,mf,mm,mh,ef,em,eh--6个初始移动距离
-    local mf=self.myfront.card:getType()--获取六个卡的兵种类型
+    local mfx,mfy,mmx,mmy,mhx,mhy,efx,efy,emx,emy,ehx,ehy,mf,mm,mh,ef,em,eh--6赂枚鲁玫脢录脪脝露炉戮脿脌毛
+    local mf=self.myfront.card:getType()--禄帽脠隆脕霉赂枚驴篓碌脛卤酶脰脰脌脿脨脥
     local mm=self.mymid.card:getType()
     local mh=self.myhead.card:getType()
     local ef=self.enefront.card:getType()
     local em=self.enemid.card:getType()
     local eh=self.enehead.card:getType()
---近战/远程两种兵，大营/中军/前锋三个初始位置，敌/我，2^3*2，16种初始站位,如果一方卡量少于3张还没考虑
+--陆眉脮陆/脭露鲁脤脕陆脰脰卤酶拢卢麓贸脫陋/脰脨戮眉/脟掳路忙脠媒赂枚鲁玫脢录脦禄脰脙拢卢碌脨/脦脪拢卢2^3*2拢卢16脰脰鲁玫脢录脮戮脦禄,脠莽鹿没脪禄路陆驴篓脕驴脡脵脫脷3脮脜禄鹿脙禄驴录脗脟
     if mf==2 and mm==2 and mh==2 then
         mfx,mfy=self:getDis(map.MYFRONTPOS,map.MYLONGMIDPOS)
         self.myfront.mapkey=3
@@ -376,69 +392,76 @@ function Game:getReady()
     self.enefront.solders:moveForward(efx,efy)
     self.enemid.solders:moveForward(emx,emy)
     self.enehead.solders:moveForward(ehx,ehy)
- 
 end
 
---解析战斗过程
+function Game:getRound0()--脳录卤赂陆脳露脦拢卢录脫buff
+
+end
+
+--陆芒脦枚脮陆露路鹿媒鲁脤
 function Game:getBattle()
-    local torecttime=0--死方阵计数
+    local torecttime=0--脣脌路陆脮贸录脝脢媒
     local action={} 
     local roundlabel=display.newTTFLabel({
         text='ROUND1',
         size=50,
         font = 'Arial'
     }):align(display.CENTER):pos(display.cx,display.height-50):addTo(self)
-    for n,m in pairs(self.cardkey) do--全部暗
+    for n,m in pairs(self.cardkey) do--脠芦虏驴掳碌
         self[m].card:endAttacked()
         self[m].solders:endAttacked()
     end
-    for i=1,8 do --8回合
-        local round=self.report['round'..i]--显示回合数
+    for i=1,8 do --8禄脴潞脧
+        local round=self.report['round'..i]--脧脭脢戮禄脴潞脧脢媒
         if round==nil then
             break 
         end
-        for j=1,6 do --每回合两边各三张牌攻击，共6牌攻击
+        for j=1,100 do --脙驴禄脴潞脧脕陆卤脽赂梅脠媒脮脜脜脝鹿楼禄梅拢卢鹿虏6脜脝鹿楼禄梅
             local attack=round['attack'..j]
             if attack==nil then break end
-            for l=1,8 do    --极限情况一个人可以攻击8次，一般两次
+            for l=1,8 do    --录芦脧脼脟茅驴枚脪禄赂枚脠脣驴脡脪脭鹿楼禄梅8麓脦拢卢脪禄掳茫脕陆麓脦
                 if  attack['atktype'..l]==nil then break end
-                action[#action+1]=transition.sequence({--保存动作
+                local atktype=attack['atktype'..l]
+                action[#action+1]=transition.sequence({--卤拢麓忙露炉脳梅
                     cc.CallFunc:create(function()
                         roundlabel:setString('ROUND'..i)
-                        self[attack.atkfrom].card:showAttacking()--显示攻击
-                        self[attack.atkfrom].solders:showAttacking()
+                        self[attack.atkfrom].card:showAttacking(atktype)--驴篓脜脝脧脭脢戮鹿楼禄梅
+                        self[attack.atkfrom].solders:showAttacking()--卤酶脮贸脧脭脢戮鹿楼禄梅
                         --printLog(attack.atkfrom,self[attack.atkfrom].solders:getPortPos().x..','..self[attack.atkfrom].solders:getPortPos().y)
-                        for k,v in pairs(attack['atkto'..l])do --攻击目标，可攻击到敌我所有人，对己方的加血也算
+                        for k,v in pairs(attack['atkto'..l])do --鹿楼禄梅脛驴卤锚拢卢驴脡鹿楼禄梅碌陆碌脨脦脪脣霉脫脨脠脣拢卢露脭录潞路陆碌脛录脫脩陋脪虏脣茫
                             local beforhp=self[k].card:getHp()
                             local hpchange
-                            self[k].solders:showAttacked()--显示被攻击
-                            self[k].card:showAttacked(v)
-                            scheduler.performWithDelayGlobal(--结束攻击效果的定时器
+                            if atktype=='normal' then
+                                self:showAttack(self.mapkey[self[attack.atkfrom].mapkey].pos,self.mapkey[self[k].mapkey].pos,k,atktype)--卤酶脮贸录盲鹿楼禄梅露炉禄颅
+                            end
+                            self[k].solders:showAttacked(v)--卤酶脮贸脧脭脢戮卤禄鹿楼禄梅
+                            self[k].card:showAttacked(v)--驴篓脜脝脧脭脢戮卤禄鹿楼禄梅
+                            scheduler.performWithDelayGlobal(--陆谩脢酶鹿楼禄梅脨搂鹿没碌脛露篓脢卤脝梅
                                 function()
-                                    self[k].card:setHp(v,1)--扣血
+                                    self[k].card:setHp(v.hp,1)--驴脹脩陋
                                     local afterhp=self[k].card:getHp()
-                                    if v<0 then
-                                        self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--被攻击死
+                                    if v.hp~=nil and v.hp<0 then
+                                        self[k].solders:die(self:getSolderNum(beforhp)-self:getSolderNum(afterhp))--卤禄鹿楼禄梅脣脌
                                     else
-                                        self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--己方复活
+                                        self[k].solders:solderNeverDie(self:getSolderNum(afterhp)-self:getSolderNum(beforhp))--录潞路陆赂麓禄卯
                                     end
-                                    self[attack.atkfrom].card:endAttacking ()--结束攻击
+                                    self[attack.atkfrom].card:endAttacking ()--陆谩脢酶鹿楼禄梅
                                     self[attack.atkfrom].solders:endAttacking()
-                                    self[k].solders:endAttacked()--结束被攻击
+                                    self[k].solders:endAttacked()--陆谩脢酶卤禄鹿楼禄梅
                                     self[k].card:endAttacked()
                                     if afterhp==0 and self[k].card:getState() then
                                         self[k].card:die()
                                         torecttime=torecttime+1
                                     end
                                 end,
-                                self[attack.atkfrom].solders:getAtktime()+0.8--攻击效果显示时间
+                                self[attack.atkfrom].solders:getAtktime()+0.8--鹿楼禄梅脨搂鹿没脧脭脢戮脢卤录盲
                             )    
                         end
                     end
                 ),
-                cc.DelayTime:create(2), --每张牌单次攻击时间间隔     
-                cc.CallFunc:create(function()--每次攻击完如果有兵阵死光就是全部整队，并调整各阵位置
-                    if self:whoWin() then--判断是否有一方死光
+                cc.DelayTime:create(2), --脙驴脮脜脜脝碌楼麓脦鹿楼禄梅脢卤录盲录盲赂么     
+                cc.CallFunc:create(function()--脙驴麓脦鹿楼禄梅脥锚脠莽鹿没脫脨卤酶脮贸脣脌鹿芒戮脥脢脟脠芦虏驴脮没露脫拢卢虏垄碌梅脮没赂梅脮贸脦禄脰脙
+                    if self:whoWin() then--脜脨露脧脢脟路帽脫脨脪禄路陆脣脌鹿芒
                         roundlabel:setString(self:whoWin())
                         for k,v in pairs(self.cardkey) do
                             if self[v].card:getState() then
@@ -467,10 +490,10 @@ function Game:getBattle()
     self:runAction(transition.sequence(action)) 
 end
 
---有兵阵死光移动剩下的兵阵
---diekey,死光的兵阵的cardkey：mymid\myfront\enehead...
---self[diekey].mapkey,格子标号
---格子分布，my/ene_close同一排
+--脫脨卤酶脮贸脣脌鹿芒脪脝露炉脢拢脧脗碌脛卤酶脮贸
+--diekey,脣脌鹿芒碌脛卤酶脮贸碌脛cardkey拢潞mymid\myfront\enehead...
+--self[diekey].mapkey,赂帽脳脫卤锚潞脜
+--赂帽脳脫路脰虏录拢卢my/ene_close脥卢脪禄脜脜
 --ENELONG      11   12   13 14    15
 --MY/ENECLOSE  6    7    8   9    10
 --MYLONG       1    2    3   4    5  
@@ -478,7 +501,7 @@ end
 function Game:moveSolders(diekey)
     local mapkey=self[diekey].mapkey--1,2,3,4....15
     local num=mapkey % 5
-    local movefrom={}--标号
+    local movefrom={}--卤锚潞脜
     local moveto={}
     local myorene
     local eneormy
@@ -489,7 +512,7 @@ function Game:moveSolders(diekey)
         myorene='ene'
         eneormy='my'
     end
-    if num==1 then--left die，mid moveto halfleft,right moveto halfright
+    if num==1 then--left die拢卢mid moveto halfleft,right moveto halfright
         movefrom[1]=mapkey+2
         moveto[1]=mapkey+1
         movefrom[2]=mapkey+4
@@ -505,7 +528,7 @@ function Game:moveSolders(diekey)
         moveto[1]=mapkey-3
         movefrom[2]=mapkey-2
         moveto[2]=mapkey-1
-    else--中间一个死，如果己方两边还有人，往中间移动，如果两边没有人，如果在远程位置没动作，如果在近程位置，敌方近战整排向前移
+    else--脰脨录盲脪禄赂枚脣脌拢卢脠莽鹿没录潞路陆脕陆卤脽禄鹿脫脨脠脣拢卢脥霉脰脨录盲脪脝露炉拢卢脠莽鹿没脕陆卤脽脙禄脫脨脠脣拢卢脠莽鹿没脭脷脭露鲁脤脦禄脰脙脙禄露炉脳梅拢卢脠莽鹿没脭脷陆眉鲁脤脦禄脰脙拢卢碌脨路陆陆眉脮陆脮没脜脜脧貌脟掳脪脝
         if self.mapkey[mapkey+2]['card'..myorene]~=nil then
             movefrom[1]=mapkey+2
             moveto[1]=mapkey+1
@@ -513,12 +536,12 @@ function Game:moveSolders(diekey)
             moveto[2]=mapkey-1
         else
             if mapkey==8 then
-                if myorene=='my'then--myclosemid死，所有eneclose移动到mylong：1，2，3，4，5
+                if myorene=='my'then--myclosemid脣脌拢卢脣霉脫脨eneclose脪脝露炉碌陆mylong拢潞1拢卢2拢卢3拢卢4拢卢5
                     for i=1,5 do
                         movefrom[i]=i+5
                         moveto[i]=i
                     end
-                else                              --eneclosemid死，所有myclose向前推到enelong：11，12，13，14，15
+                else                              --eneclosemid脣脌拢卢脣霉脫脨myclose脧貌脟掳脥脝碌陆enelong拢潞11拢卢12拢卢13拢卢14拢卢15
                     for i=1,5 do
                         movefrom[i]=i+5
                         moveto[i]=i+10
@@ -527,7 +550,6 @@ function Game:moveSolders(diekey)
             end
         end
     end
-
     if  mapkey==8 and self.mapkey[mapkey+2]['card'..myorene]==nil then
         for i=1,#movefrom do
             if self.mapkey[movefrom[i]]['card'..eneormy]~=nil then
@@ -535,11 +557,9 @@ function Game:moveSolders(diekey)
                 self[self.mapkey[movefrom[i]]['card'..eneormy]].solders:moveForward(self:getDis(self.mapkey[movefrom[i]].pos,self.mapkey[moveto[i]].pos))
                 self.mapkey[moveto[i]]['card'..eneormy]=self.mapkey[movefrom[i]]['card'..eneormy]
                 self.mapkey[movefrom[i]]['card'..eneormy]=nil
-
-
-                printLog(diekey,self[diekey].mapkey)
-                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..eneormy]..'from'..movefrom[i])
-                printLog('moveto'..i,moveto[i])
+--                printLog(diekey,self[diekey].mapkey)
+--                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..eneormy]..'from'..movefrom[i])
+--                printLog('moveto'..i,moveto[i])
             end
         end             
     else
@@ -550,25 +570,64 @@ function Game:moveSolders(diekey)
                 self.mapkey[moveto[i]]['card'..myorene]=self.mapkey[movefrom[i]]['card'..myorene]
                 self.mapkey[movefrom[i]]['card'..myorene]=nil
 
-                printLog(diekey,self[diekey].mapkey)
-                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..myorene]..'from'..movefrom[i])
-                printLog('moveto'..i,moveto[i])
+--                printLog(diekey,self[diekey].mapkey)
+--                printLog('movefrom'..i,self.mapkey[moveto[i]]['card'..myorene]..'from'..movefrom[i])
+--                printLog('moveto'..i,moveto[i])
             end            
         end
     end
 end
 
-function Game:whoWin()
+function Game:showAttack(posfrom,posto,k)--鹿楼禄梅脤脴脨搂
+    local aposfrom=posfrom
+    local aposto=posto
+    if aposfrom==aposto then
+        if string.sub(k,1,1)=='e' then
+            aposfrom=cc.p(aposfrom.x-40,aposfrom.y-20)
+            aposto=cc.p(aposto.x+40,aposto.y+20)
+        else
+            aposfrom=cc.p(aposfrom.x+40,aposfrom.y+20)
+            aposto=cc.p(aposto.x-40,aposto.y-20)
+        end
+    end
+    local attacksprite=display.newSprite('attack.png')
+                        :align(display.CENTER)
+                        :pos(aposfrom.x,aposfrom.y)
+                        :setRotation(-self:getAngle(aposfrom,aposto))
+                        :addTo(self)
+    if string.sub(k,1,1)=='m' then
+        attacksprite:setRotation(90-self:getAngle(aposfrom,aposto))
+    end
+    transition.moveTo(attacksprite,{x=aposto.x,
+                                    y=aposto.y,
+                                    time=0.5,
+                                    onComplete=function()
+                                        attacksprite:removeSelf()
+                                    end})
+end
+
+function Game:getAngle(posfrom,posto)
+    local l=posto.y-posfrom.y
+    local d=math.sqrt((posto.y-posfrom.y)*(posto.y-posfrom.y)+(posto.x-posfrom.x)*(posto.x-posfrom.x))
+    local lsin=l/d
+    return math.deg(math.asin(lsin))
+end
+
+function Game:whoWin()--脜脨露脧脫庐
     if self.mymid.card:getState()==nil and
        self.myhead.card:getState()==nil and
        self.myfront.card:getState()==nil then
            return 'LOSE'
     end
-    if self.enemid.card:getState()==nil and
+    if 
+       self.enemid.card:getState()==nil and
        self.enehead.card:getState()==nil and
        self.enefront.card:getState()==nil  then
            return 'WIN'
     end
+--    else 
+--        return 'DRAW'
+--    end
 end
 
 function Game:getMyHeadpos()
@@ -596,7 +655,7 @@ function Game:getEneFirstpos()
 end
 
 function Game:showTest()
-    self.lable1=cc.ui.UILabel.new({--前进
+    self.lable1=cc.ui.UILabel.new({--脟掳陆酶
         text='moveforward',
         x=display.width-300,
         y=display.height-100,
@@ -630,7 +689,7 @@ function Game:showTest()
                                 return true
                               end)
 
-   self.lable2=cc.ui.UILabel.new({--攻击
+   self.lable2=cc.ui.UILabel.new({--鹿楼禄梅
         text='attack',
         x=display.width-300,
         y=display.height-150,
@@ -650,7 +709,7 @@ function Game:showTest()
                                 return true
                               end)
 
-   self.lable3=cc.ui.UILabel.new({--逃跑
+   self.lable3=cc.ui.UILabel.new({--脤脫脜脺
         text='runaway',
         x=display.width-300,
         y=display.height-200,
@@ -670,7 +729,7 @@ function Game:showTest()
                                 return true
                               end)
 
-   self.lable4=cc.ui.UILabel.new({--死
+   self.lable4=cc.ui.UILabel.new({--脣脌
         text='solderdie',
         x=display.width-300,
         y=display.height-250,
@@ -690,7 +749,7 @@ function Game:showTest()
                                 return true
                               end)
 
-   self.lable5=cc.ui.UILabel.new({--整队
+   self.lable5=cc.ui.UILabel.new({--脮没露脫
         text='reformat',
         x=display.width-300,
         y=display.height-300,
@@ -710,7 +769,7 @@ function Game:showTest()
                                 return true
                               end)
 
-        self.lable6=cc.ui.UILabel.new({--变成方阵
+        self.lable6=cc.ui.UILabel.new({--卤盲鲁脡路陆脮贸
          text='toRect',
          x=display.width-300,
          y=display.height-350,
@@ -730,7 +789,7 @@ function Game:showTest()
                                 return true
                               end)
 
-       self.lable6=cc.ui.UILabel.new({--变成楔形
+       self.lable6=cc.ui.UILabel.new({--卤盲鲁脡脨篓脨脦
         text='toWedge',
         x=display.width-300,
         y=display.height-400,
@@ -803,7 +862,7 @@ function Game:showTest()
                                       return true
                                   end)
 
-       self.lable10=cc.ui.UILabel.new({--变成楔形
+       self.lable10=cc.ui.UILabel.new({--卤盲鲁脡脨篓脨脦
         text='solderneverdie',
         x=display.width-300,
         y=display.height-450,

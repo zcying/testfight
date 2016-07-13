@@ -297,6 +297,7 @@
     <Content Include="testfight\res\myinfwalk.plist" />
     <Content Include="testfight\res\myinfwalk.png" />
     <Content Include="testfight\res\solder.png" />
+    <Content Include="testfight\res\testjpg.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="testfight\src\app\models\Battle.lua" />
